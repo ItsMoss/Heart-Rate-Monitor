@@ -8,14 +8,14 @@ class run(unittest.TestCase):
         Tests the read_data function from heart_rate.py
         """
         # CREATE BINARY FILE HERE
-        binary_file = 0 # <-- replace with file that simply contains 1 byte = 18
+        binary_file = "test.bin"
         
         v, b = hr.read_data(binary_file, 0)
         
         # DELETE BINARY FILE HERE
         
         self.assertEqual(v, 18, msg="There are 10 types of people...those who know binary and those who do not!")
-        self.assertEqual(b, 2, msg="You hungry? Cause these bytes do not add up :)")
+        self.assertEqual(b, 2, msg="You hungry? Cause these bytes do not add up :P")
         
 
 if __name__ == '__main__':

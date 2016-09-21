@@ -5,7 +5,7 @@ def main():
     b = 0 # counter for the byte number that is being read in
     t = 1 # time in seconds to take samples from
     n = 2 # number of signals being multiplexed
-    binary_file = "test.bin" # NOTE. I should go back and make these parameters into main()
+    binary_file = "" # NOTE. I should go back and make these parameters into main()
     
     Fs, b = read_data(binary_file, b)
     samples = Fs * t
@@ -17,7 +17,7 @@ def main():
             v, b = read_data(binary_file, b)
             signals[j][i] = v
         
-            print("signal %d: " %(j+1), signals[j])
+            print("signal %d: " %(j+1), signals[j]) # NOTE. This is for testing
 
 def read_data(file, read_from):
     """
