@@ -2,9 +2,9 @@ def main():
     """
     This is the main file that runs the whole program
     """
-    b = 0
-    t = 1
-    n = 2
+    b = 0 # counter for the byte number that is being read in
+    t = 1 # time in seconds to take samples from
+    n = 2 # number of signals being multiplexed
     
     Fs, b = read_data("test.bin", b)
     samples = Fs * t
