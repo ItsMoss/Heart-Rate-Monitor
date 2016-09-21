@@ -5,26 +5,29 @@ def main():
     b = 0 # counter for the byte number that is being read in
     t = 1 # time in seconds to take samples from
     n = 2 # number of signals being multiplexed
+    binary_file = "test.bin" # NOTE. I should go back and make these parameters into main()
     
-    Fs, b = read_data("test.bin", b)
+    Fs, b = read_data(binary_file, b)
     samples = Fs * t
     
     signals = [[0 for x in range(samples)] for x in range(n)]
     
     for i in range(samples):
         for j in range(len(signals)):
-            v, b = read_data("test.bin", b)
+            v, b = read_data(binary_file, b)
             signals[j][i] = v
         
             print("signal %d: " %(j+1), signals[j])
 
 def read_data(file, read_from):
     """
-    This function reads in a binary file and converts it to integer values
-    assuming bit size of 16
+    This function reads in a single byte from a binary file and converts it to
+    integer value assuming bit size of 16
     
     :param str file: name of the input binary file
     :param int read_from: represents the number byte to start reading from
+    :return int v: the integer value of the byte read
+    :return int read_from + 2: represents the next byte number to be read
     """
     with open(file, 'rb') as f:
         f.seek(read_from)
