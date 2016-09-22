@@ -35,6 +35,15 @@ def read_data(file, read_from):
         v = int.from_bytes(bs, 'little')
         
     return v, read_from + 2
+    
+def check_data(signals):
+    """
+    This function ensures that all values read in from the input signal are
+    valid (i.e. not NaN) in order to do arithmetic on
+    
+    :param list signals: contains the read-in signal(s)
+    """
+    pass
 
 if __name__ == '__main__':
     main()
