@@ -1,15 +1,21 @@
-def main():
+def main(binary_file="test.bin",time=5, n=2):
     """
     This is the main file that runs the whole program
-    """
-
-    b = 0 # counter for the byte number that is being read in
-    t = 1 # time in seconds to take samples from
-    n = 2 # number of signals being multiplexed
-    binary_file = "" # NOTE. I should go back and make these parameters into main()
     
-    Fs, b = read_data(binary_file, b)
-    samples = Fs * t
+    :param int time: duration of time (in seconds) being read-in from binary file
+    :param int n: number of signals being multiplexed
+    """    
+    
+    b = 0 # counter for the byte number that is being read in
+    
+    Fs, b = read_data(binary_file, b) # determine sampling frequency
+    
+    # make sure time is at least 5 seconds and a whole number
+    if time < 5:
+        time = 5
+    time //= 1
+    
+    samples = Fs * time
     
     signals = [[0 for x in range(samples)] for x in range(n)]
     
