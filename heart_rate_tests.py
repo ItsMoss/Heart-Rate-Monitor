@@ -142,6 +142,29 @@ class run(unittest.TestCase):
             self.assertGreaterEqual(output2[0], 0, msg="I am positive that you messed up the positive values")
         elif test_list_2[0] < 0:
             self.assertLessEqual(output2[0], 0, msg="Not trying to be negative, but you definitely messed this up")
+            
+    def test_make_QRS_kernel(self):
+        """
+        Tests the make_QRS_kernel function from heart_rate.py
+        """
+        # Test Case 1 - 50 samples/sec
+        Fs1 = 50
+        output1 = hr.make_QRS_kernel(Fs1)
+        
+        self.assertListEqual(output1, [0, 0.33, 0.67, 1, 0.50, 0], msg="50 Hz kernel does not even look like a triangle")
+        
+        # Test Case 2 - 20 samples/sec
+        Fs2 = 20
+        output2 = hr.make_QRS_kernel(Fs2)
+        
+        self.assertListEqual(output2, [0, 1, 0], msg="This 20 Hz kernel looks worse than molded popcorn")
+        
+    def test_cross_correlate(self):
+        """
+        Tests the cross_correlate function from heart_rate.py
+        """
+        pass
+    
         
     def test_find_peaks(self):
         """

@@ -1,4 +1,5 @@
 import heart_rate as hr
+import heart_rate_helpers as helper
 
 def main(binary_file="test.bin",time=5, n=2):
     """
@@ -21,7 +22,7 @@ def main(binary_file="test.bin",time=5, n=2):
     time //= 1
     
     # B) Calculate amount of samples to take
-    samples = Fs * time
+    samples = helper.myRound(Fs * time + 1)
     
     # C) Initialize list based on input n variable and samples
     signals = [[0 for x in range(samples)] for x in range(n)]

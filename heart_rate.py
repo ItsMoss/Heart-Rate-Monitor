@@ -130,6 +130,56 @@ def normalize(signal):
     norm_signal = signal
     
     return norm_signal
+    
+def make_QRS_kernel(Fs, amplitude=1):
+    """
+    This function creates a kernel resembling a QRS complex based on input
+    sampling frequency Fs. This function assumes the average QRS complex
+    time-length of 0.10 seconds, and simply creates a spike at 0.05 seconds
+    with linear slope on each side going to zero (i.e. a triangular wave).
+    
+    :param int Fs: sampling frequency in Hz
+    :param int amplitude: amplitude of spike
+    :return list kernel: calculated QRS kernel
+    """
+    # Initialize list based off of Fs
+    t = 0.10 # QRS time-length
+    samples = helper.myRound(Fs * t + 1)
+
+    if samples < 3:
+        print("\nSampling frequency is ridiculously low\n")
+        raise IndexError # This really should not happen
+    
+    kernel = [0 for x in range(samples)]
+    
+    # Create spike
+    spike_at = helper.myRound((samples - 1) / 2) # index of spike
+    slope_up = amplitude / spike_at
+    slope_down = -1 * amplitude / (samples - 1 - spike_at)
+    
+    for i in range(1, spike_at):
+        kernel[i] = round(i * slope_up, 2)
+        
+    kernel[spike_at] = amplitude
+    
+    for j in range(spike_at + 1, samples - 1):
+        kernel[j] = round((j - spike_at) * slope_down + amplitude, 2)
+        
+    return kernel
+
+def cross_correlate(signal, kernel):
+    """
+    This function cross correlates a signal with a kernel, where the kernel
+    has time-length less than the signal and is slid across the signal
+    
+    :param list signal: input signal
+    :param list kernel: input kernel
+    """
+    if len(kernel) >= len(signal):
+        print("\nKernel length cannot be greater than signal length\n")
+        raise IndexError
+        
+    pass
 
 def find_peaks(signal, Fs):
     """
@@ -140,7 +190,7 @@ def find_peaks(signal, Fs):
     """
     
     # First create a simple kernel resembling a QRS complex
-    QRSkernel = makeQRSkernel(Fs)
+    QRSkernel = make_QRS_kernel(Fs)
     
     # Cross-correlate QRS kernel with signal
     sigXkern = cross_correlate(signal, QRSkernel)
