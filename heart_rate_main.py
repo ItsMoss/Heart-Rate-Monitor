@@ -27,9 +27,12 @@ def main(binary_file="test.bin",time=5, n=2):
 
             v, b = hr.read_data(binary_file, b)
             signals[j][i] = v
+    
+    for k in range(len(signals)):
+        signals[k] = hr.no_NaNsense(signals[k])
         
-            print("signal %d: " %(j+1), signals[j]) # NOTE. This is for testing
-            
+    print("signal 1: %r" % signals[0])
+    print("signal 2: %r" % signals[1])
 
 if __name__ == '__main__':
     main()
