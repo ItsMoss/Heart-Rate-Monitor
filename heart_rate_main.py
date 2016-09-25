@@ -4,6 +4,7 @@ def main(binary_file="test.bin",time=5, n=2):
     """
     This is the main file that runs the whole program
     
+    :param str binary_file: name of input binary file
     :param int time: duration of time (in seconds) being read-in from binary file
     :param int n: number of signals being multiplexed
     """    

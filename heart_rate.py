@@ -11,6 +11,20 @@ def read_data(file, read_from):
     with open(file, 'rb') as f:
         f.seek(read_from)
         bs = f.read(1)
-        v = int.from_bytes(bs, 'little')
+        try:
+            v = int.from_bytes(bs, 'little')
+        except TypeError:
+            v = None
         
     return v, read_from + 2
+
+def no_NaNsense(signal):
+    """
+    This function makes sure that all values within the input list are integers
+    If a NaN occurs linear interpolation is attempted, and if that fails the
+    value is set to the average integer value
+    
+    :param list signal: a list
+    :return list signal_no_nan: list without any NaN's
+    """
+    pass
