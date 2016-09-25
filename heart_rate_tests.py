@@ -163,9 +163,29 @@ class run(unittest.TestCase):
         """
         Tests the cross_correlate function from heart_rate.py
         """
-        pass
-    
+        from random import randrange
+        kernel = [0, 0.5, 1, 0.5, 0]
         
+        # Test Case 1 - Random Signal 1
+        test_list_1 = [randrange(20) for x in range(10)]
+        output1 = hr.cross_correlate(test_list_1, kernel)
+        test_var1a = 0.5 * (test_list_1[1] + test_list_1[3]) + test_list_1[2]
+        test_var1b = 0.5 * (test_list_1[6] + test_list_1[8]) + test_list_1[7]
+        
+        self.assertEqual(len(output1), 6, msg="Output of cross correlation is incorrect length. Need a ruler?")
+        self.assertEqual(output1[0], test_var1a, msg="You are doing something wrong at the start of cross correlation")
+        self.assertEqual(output1[-1], test_var1b, msg="You are doing something wrong at the end of cross correlation")
+        
+        # Test Case 2 - Random Signal 2
+        test_list_2 = [randrange(20) for x in range(12)]
+        output2 = hr.cross_correlate(test_list_2, kernel)
+        test_var2a = 0.5 * (test_list_2[1] + test_list_2[3]) + test_list_2[2]
+        test_var2b = 0.5 * (test_list_1[8] + test_list_1[10]) + test_list_2[9]
+        
+        self.assertEqual(len(output2), 8, msg="Wait, were you using metric or imperial units...or both?")
+        self.assertEqual(output2[0], test_var2a, msg="Something at the start of your cross-correlation is way off the mark...palmeri")
+        self.assertEqual(output2[-1], test_var2b, msg="Something at the end of your cross correlation is way off the mark...cuban")
+            
     def test_find_peaks(self):
         """
         Tests the find_peaks function from heart_rate.py
