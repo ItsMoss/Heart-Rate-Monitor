@@ -111,6 +111,38 @@ class run(unittest.TestCase):
         diff3 = abs(helper.listAverage(output3) - helper.listAverage(test_list_3))
         self.assertLessEqual(diff3, 0.5, msg="This frequency should not be stopped, it should be go'ed")
         
-
+    def test_normalize(self):
+        """
+        Tests the normalize function from heart_rate.py
+        """
+        from random import randrange
+        
+        # Test Case 1 - Random Signal 1
+        test_list_1 = [randrange(-20, 20) for x in range(20)]
+        output1 = hr.normalize(test_list_1)
+        
+        self.assertLessEqual(max(output1), 1, msg="I think you accidentally used your abnormalize function")
+        self.assertGreaterEqual(min(output1), -1, msg="You should probably just delete the abnormalize function")
+        if test_list_1[0] == 0:
+            self.assertEqual(output1[0], 0, msg="Values that are zero should stay zero")
+        elif test_list_1[0] > 0:
+            self.assertGreaterEqual(output1[0], 0, msg="Positive values should remain positive")
+        elif test_list_1[0] < 0:
+            self.assertLessEqual(output1[0], 0, msg="Negative values should remain negative")
+        
+        # Test Case 2 - Random Signal 2
+        test_list_2 = [randrange(-20, 20) for x in range(20)]
+        output2 = hr.normalize(test_list_2)
+        
+        self.assertLessEqual(max(output2), 1, msg="I think your abnormalize function was inadvertently used")
+        self.assertGreaterEqual(min(output2), -1, msg="Something seems unusally abnormal, for something that should be normal...")
+        if test_list_2[0] == 0:
+            self.assertEqual(output2[0], 0, msg="Zero normalied should still be zero")
+        elif test_list_2[0] > 0:
+            self.assertGreaterEqual(output2[0], 0, msg="I am positive that you messed up the positive values")
+        elif test_list_2[0] < 0:
+            self.assertLessEqual(output2[0], 0, msg="Not trying to be negative, but you definitely messed this up")
+        
+        
 if __name__ == '__main__':
     unittest.main()

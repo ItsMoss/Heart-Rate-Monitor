@@ -107,3 +107,30 @@ def band_stop_filter(signal, Fs, Fc=60):
     
     return signal_clean
     
+def normalize(signal):
+    """
+    This function normalizes all values from -1 to 1
+    
+    :param list signal: input signal
+    :return list norm_signal: normalized signal
+    """
+    print("before: %r" % signal)
+    # Let's find the maximum and minimum values
+    maximum = max(signal)
+    minimum = min(signal)
+    
+    # Choose the one with greater magnitude
+    greatest = abs(maximum)
+    if abs(maximum) < abs(minimum):
+        greatest = abs(minimum)
+        
+    # Normalize
+    for i, v in enumerate(signal):
+        signal[i] = round(v / greatest, 2)
+        
+    norm_signal = signal
+    print("after: %r" % norm_signal)
+    
+    return norm_signal
+        
+    
