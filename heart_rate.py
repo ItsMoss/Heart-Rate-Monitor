@@ -1,5 +1,7 @@
 import heart_rate_helpers as helper
 
+EOF = "\nEnd Of File reached!\n"
+
 def read_data(file, read_from):
     """
     This function reads in a single byte from a binary file and converts it to
@@ -13,12 +15,14 @@ def read_data(file, read_from):
     with open(file, 'rb') as f:
         f.seek(read_from)
         bs = f.read(1)
+        if bs == b'':
+            return EOF, read_from
         try:
             v = int.from_bytes(bs, 'little')
         except TypeError:
             v = None
         
-    return v, read_from + 2
+    return v, read_from + 1
 
 def no_NaNsense(signal):
     """
