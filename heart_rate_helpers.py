@@ -109,6 +109,12 @@ def makeSine(time, amplitude, frequency, phase=0):
     """
     This function is for creating sine waves of varying time, amplitude, freq,
     and phase for simulating input signals
+    
+    :param int time: time in seconds for sine curve
+    :param int amplitude: amplitude of sine curve
+    :param int frequency: frequency of sine curve in Hz
+    :param int phase: phase of sine curve in radians
+    :return array curve: calculated sine curve
     """
     from numpy import sin, pi, arange
     t = arange(0, time, 0.01)
@@ -117,12 +123,26 @@ def makeSine(time, amplitude, frequency, phase=0):
     p = phase
     
     curve = a * sin(2 * pi * f * t + p)
+    for p in range(len(curve)):
+        curve[p] = round(curve[p], 2)
+        
+#    from matplotlib.pyplot import figure, plot, show
+#    figure(1)
+#    plot(t, curve)
+#    show()
+    
     return curve
             
 def makeCosine(time, amplitude, frequency, phase=0):
     """
-    This function is for creating sine waves of varying time, amplitude, freq,
+    This function is for creating cosine waves of varying time, amplitude, freq,
     and phase for simulating input signals
+    
+    :param int time: time in seconds for cosine curve
+    :param int amplitude: amplitude of cosine curve
+    :param int frequency: frequency of cosine curve in Hz
+    :param int phase: phase of cosine curve in radians
+    :return array curve: calculated cosine curve
     """
     from numpy import cos, pi, arange
     t = arange(0, time, 0.01)
@@ -131,4 +151,30 @@ def makeCosine(time, amplitude, frequency, phase=0):
     p = phase
     
     curve = a * cos(2 * pi * f * t + p)
+    for p in range(len(curve)):
+        curve[p] = round(curve[p], 2)
     return curve
+    
+def dotProduct(list1, list2):
+    """
+    This function determines the dot product of two lists
+    
+    :param list list1: input list 1
+    :param list list2: input list 2
+    :return int dp: calculated dot product (could also be type float)
+    """
+    # Exit function if lengths are not the same
+    if len(list1) != len(list2):
+        print("\nBoth input lists must have the same length\n")
+        raise IndexError
+        
+    # NOTE. This function does not check that both lists only contain numbers
+    # but it is expected to work properly
+        
+    L = len(list1)
+    dp = 0
+        
+    for i in range(L):
+        dp += list1[i] * list2[i]
+        
+    return dp

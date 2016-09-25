@@ -180,7 +180,7 @@ class run(unittest.TestCase):
         test_list_2 = [randrange(20) for x in range(12)]
         output2 = hr.cross_correlate(test_list_2, kernel)
         test_var2a = 0.5 * (test_list_2[1] + test_list_2[3]) + test_list_2[2]
-        test_var2b = 0.5 * (test_list_1[8] + test_list_1[10]) + test_list_2[9]
+        test_var2b = 0.5 * (test_list_2[8] + test_list_2[10]) + test_list_2[9]
         
         self.assertEqual(len(output2), 8, msg="Wait, were you using metric or imperial units...or both?")
         self.assertEqual(output2[0], test_var2a, msg="Something at the start of your cross-correlation is way off the mark...palmeri")
@@ -194,23 +194,25 @@ class run(unittest.TestCase):
         
         t = 4 * pi
         A = 1
-        f = 1
+        f = 1 / (2 * pi)
+        
+        Fs = 700
         
         # Test Case 1 - Signal with 2 obvious peaks
         test_list_1 = list(helper.makeSine(t, A, f))
-        output1 = hr.find_peaks(test_list_1)
+        output1 = hr.find_peaks(test_list_1, Fs)
         
         self.assertEqual(output1, 2, msg="If you cannot count peaks, you really need to re-think career paths")
         
         # Test Case 2 - Signal with 3 peaks (but 2 are the first and last value respectively)
         test_list_2 = list(helper.makeCosine(t, A, f))
-        output2 = hr.find_peaks(test_list_2)
+        output2 = hr.find_peaks(test_list_2, Fs)
         
         self.assertEqual(output2, 3, msg="Don't forget to check the ends, they have feelings too")
         
         # Test Case 3 - Only DC (i.e. no peaks)
         test_list_3 = [A for x in range(helper.myRound(t))]
-        output3 = hr.find_peaks(test_list_3)
+        output3 = hr.find_peaks(test_list_3, Fs)
         
         self.assertEqual(output3, 0, msg="Did you know that you don't need to count, to count zero times?")        
         

@@ -174,12 +174,23 @@ def cross_correlate(signal, kernel):
     
     :param list signal: input signal
     :param list kernel: input kernel
+    :return list x_coeffs: list of calculated cross correlation coefficients
     """
     if len(kernel) >= len(signal):
         print("\nKernel length cannot be greater than signal length\n")
         raise IndexError
         
-    pass
+    # Initialize correlation coefficients list
+    return_length = len(signal) - len(kernel) + 1
+    x_coeffs = [0 for x in range(return_length)]
+    
+    k_len = len(kernel)
+    
+    for i in range(return_length):
+        overlap = signal[i:i+k_len]
+        x_coeffs[i] = helper.dotProduct(overlap, kernel)
+        
+    return x_coeffs    
 
 def find_peaks(signal, Fs):
     """
@@ -189,18 +200,32 @@ def find_peaks(signal, Fs):
     :return int peak_count: number of peaks detected
     """
     
-    # First create a simple kernel resembling a QRS complex
-    QRSkernel = make_QRS_kernel(Fs)
-    
-    # Cross-correlate QRS kernel with signal
-    sigXkern = cross_correlate(signal, QRSkernel)
-    
-    # Count up peaks
+    L = len(signal)
+    threshold = 0.6 * max(signal)
     peak_count = 0
-    threshold = 0.6 * max(sigXkern)
-    for x in sigXkern:
-        if x >= threshold:
+    above = False
+    
+    # Make sure peaks actually even exist, otherwise return 0
+    dc = signal[0]
+    i = 0
+    while dc == signal[i]:
+        dc = signal[i]
+        i += 1
+        if i == len(signal) - 1:
+            return 0
+    
+    # Look for changes from above to below the threshold
+    for j in range(L - 1):
+        if signal[j] > threshold:
+            above = True
+        else:
+            above = False
+        if above == True and signal[j+1] <= threshold:
             peak_count += 1
+    
+    # Check last value
+    if signal[-1] > threshold and above == True:
+        peak_count += 1
     
     return peak_count
     
