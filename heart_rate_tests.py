@@ -34,17 +34,23 @@ class run(unittest.TestCase):
         
         self.assertListEqual(output2, [1,2,3,3,5], msg="You missed a NaN, double check your receipt maybe.")
         
-        # Test Case 3 - Two NaNs
+        # Test Case 3 - Two adjacent NaNs
         test_list_3 = [1,'NaN',True,3,4]
         output3 = hr.no_NaNsense(test_list_3)
         
-        self.assertListEqual(output3, [1,3,3,3,4], msg="You can't make Naan without NaN and you missed two!")
+        self.assertListEqual(output3, [1,0,2,3,4], msg="You can't make Naan without NaN and you missed two!")
         
-        # Test Case 4 - NaNs at both ends
-        test_list_4 = ['NaN',1,2,3,True]
+        # Test Case 4 - Two non-adjacent NaNs
+        test_list_4 = [1,'NaN',3,True,6]
         output4 = hr.no_NaNsense(test_list_4)
         
-        self.assertListEqual(output4, [1,1,2,3,3], msg="This is driving me baNaNas, maybe I should just compare apples to apples :)")
+        self.assertListEqual(output4, [1,2,3,5,6], msg="You can't make Naan without NaN even if they are spaced out!")
+        
+        # Test Case 5 - NaNs at both ends
+        test_list_5 = ['NaN',1,2,3,True]
+        output5 = hr.no_NaNsense(test_list_5)
+        
+        self.assertListEqual(output5, [1,1,2,3,3], msg="This is driving me baNaNas, maybe I should just compare apples to apples :)")
 
 if __name__ == '__main__':
     unittest.main()
