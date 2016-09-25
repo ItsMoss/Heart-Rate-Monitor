@@ -42,6 +42,9 @@ def listAverage(input_list):
     
     numerator = 0
     for i in range(denominator):
+        if type(input_list[i]) != int:
+            print("\nList must only consist of integer values\n")
+            raise TypeError
         numerator += input_list[i]
         
     average = numerator / denominator
