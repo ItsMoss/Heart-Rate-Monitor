@@ -50,3 +50,23 @@ def listAverage(input_list):
     average = numerator / denominator
     
     return average
+    
+def listInts(input_list):
+    """
+    This function takes a list of ints and/or floats and converts all values to
+    type int
+    
+    :param list input_list: list of ints and/or floats
+    :return list int_list: list of only ints
+    """
+    for i in range(len(input_list)):
+        try:
+            input_list[i] = int(input_list[i])
+        except (TypeError, ValueError):
+            print("\nValues in input list must be types int or float\n")
+            raise TypeError
+    
+    int_list = input_list
+    
+    return int_list
+            

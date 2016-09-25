@@ -46,7 +46,7 @@ def no_NaNsense(signal):
         if type(v) != int:
             low = signal[i-1]
             hi = signal[i+1]
-            signal[i] = helper.listAverage(low, hi)
+            signal[i] = helper.myAverage(low, hi)
         
     # Lastly, let's check the first and last indices
     if type(signal[0]) != int:
@@ -57,3 +57,22 @@ def no_NaNsense(signal):
     signal_no_nan = signal
     
     return signal_no_nan
+    
+def remove_offset(signal):
+    """
+    This function removes DC offset of an input signal
+    
+    :param list signal: input signal
+    :return list signal_clean: cleaned up signal (i.e. without offset)
+    """
+    from numpy import array, int16, ones, convolve
+    
+    np_signal = array(signal, dtype=int16)
+    
+    window = len(signal) // 5
+    avg_signal = convolve(np_signal, ones(window, dtype=int16) / window, mode='same')
+    signal_clean = np_signal - avg_signal
+    
+    signal_clean = helper.listInts(list(signal_clean))
+    
+    return signal_clean

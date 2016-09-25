@@ -17,7 +17,7 @@ class run(unittest.TestCase):
         
         # Test Case 1 - Accurate output values
         self.assertEqual(v, 1, msg="There are 10 types of people...those who know binary and those who do not!")
-        self.assertEqual(b, 2, msg="You hungry? Cause these bytes do not add up :P")
+        self.assertEqual(b, 1, msg="You hungry? Cause these bytes do not add up :P")
         
         # Test Case 2 - Correct output type
         self.assertEqual(type(b), int, msg="NaN...and I don't mean that delicious Indian bread")
@@ -56,28 +56,28 @@ class run(unittest.TestCase):
         
         self.assertListEqual(output5, [1,1,2,3,3], msg="This is driving me baNaNas, maybe I should just compare apples to apples :)")
         
-    def test_remove_offset_and_lpf(self):
+    def test_remove_offset(self):
         """
-        Tests the remove_offset_and_lpf function from heart_rate.py
+        Tests the remove_offset function from heart_rate.py
         """
         from random import randrange
         
         # Test Case 1 - Only DC
         test_list_1 = [10 for x in range(20)]
-        output1 = hr.remove_offset_and_lpf(test_list_1)
+        output1 = hr.remove_offset(test_list_1)
         
-        self.assertListEqual(output1, [0 for x in range(20)], msg="Unable to handle DC? must not be a fan of Batman I presume.")
+        self.assertAlmostEqual(helper.listAverage(output1[2:-2]), 0, msg="Unable to handle DC? must not be a fan of Batman I presume.")
         
         # Test Case 2 - Randomly Generated signal        
         test_list_2 = [randrange(20) for x in range(20)]
-        output2 = hr.remove_offset_and_lpf(test_list_2)
+        output2 = hr.remove_offset(test_list_2)
         
         self.assertLessEqual(helper.listAverage(output2), helper.listAverage(test_list_2), msg="Averaging of signal is more screwed up than...a screw")
         
         # Test Case 3 - Periodic Square wave
         test_list_3 = [0 for x in range(5)] + [10 for x in range(5)]
         test_list_3 = test_list_3 + test_list_3
-        output3 = hr.remove_offset_and_lpf(test_list_3)
+        output3 = hr.remove_offset(test_list_3)
         
         self.assertEqual(max(output3), 5, msg="Don't be square, be aware...of your mistakes")
         
