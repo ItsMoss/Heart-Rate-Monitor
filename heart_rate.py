@@ -93,7 +93,7 @@ def band_stop_filter(signal, Fs, Fc=60):
     
     # Create filter
     nyq_f = Fs / 2
-    f_range = 10
+    f_range = 2
     f_low = (Fc - f_range) / nyq_f
     f_hi = (Fc + f_range) / nyq_f
     
@@ -114,7 +114,6 @@ def normalize(signal):
     :param list signal: input signal
     :return list norm_signal: normalized signal
     """
-    print("before: %r" % signal)
     # Let's find the maximum and minimum values
     maximum = max(signal)
     minimum = min(signal)
@@ -129,16 +128,29 @@ def normalize(signal):
         signal[i] = round(v / greatest, 2)
         
     norm_signal = signal
-    print("after: %r" % norm_signal)
     
     return norm_signal
 
-def find_peaks(signal):
+def find_peaks(signal, Fs):
     """
     This function finds all local maxima within a given signal
     
     :param list signal: inut signal
     :return int peak_count: number of peaks detected
     """
-    pass
+    
+    # First create a simple kernel resembling a QRS complex
+    QRSkernel = makeQRSkernel(Fs)
+    
+    # Cross-correlate QRS kernel with signal
+    sigXkern = cross_correlate(signal, QRSkernel)
+    
+    # Count up peaks
+    peak_count = 0
+    threshold = 0.6 * max(sigXkern)
+    for x in sigXkern:
+        if x >= threshold:
+            peak_count += 1
+    
+    return peak_count
     
