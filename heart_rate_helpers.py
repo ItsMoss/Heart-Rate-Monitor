@@ -1,4 +1,4 @@
-def listAverage(n1, n2):
+def myAverage(n1, n2):
     """
     This function calculates the average of two integers
     If one of the input numbers is not an integer a zero is returned
@@ -26,3 +26,24 @@ def myRound(n):
         r = int(n)
         
     return r
+    
+def listAverage(input_list):
+    """
+    This function finds the average value in a list
+    
+    :param list input_list: a list of all integer values
+    :return float average: calculated list average
+    """
+    if len(input_list) < 1:
+        print("\nCannot take average. List has length=0\n")
+        raise IndexError
+
+    denominator = len(input_list)
+    
+    numerator = 0
+    for i in range(denominator):
+        numerator += input_list[i]
+        
+    average = numerator / denominator
+    
+    return average
