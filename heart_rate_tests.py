@@ -242,5 +242,40 @@ class run(unittest.TestCase):
         self.assertEqual(hr.calculate_heart_rate(beats3, time2), 93.33, msg="Learn how to divide 14 / 9 then multiply 60")
         self.assertEqual(hr.calculate_heart_rate(beats3, time3), 420, msg="Learn how to divide 14 / 2 then multiply 60")
         
+    def test_detect_bradycardia(self):
+        """
+        Tests the detect_bradycardia function from heart_rate.py
+        """
+        # Test Case 1 - Has Bradycardia
+        hr1 = 20
+        output1 = hr.detect_bradycardia(hr1)
+        
+        self.assertEqual(output1, True, msg="Maybe you are missing a few heartbeats yourself?")
+        
+        # Test Case 2 - Does NOT
+        hr2 = 70
+        output2 = hr.detect_bradycardia(hr2)
+        
+        self.assertEqual(output2, False, msg="Maybe you are NOT missing some heartbeats, but ARE missing some brain cells")
+        
+    def test_detect_tachycardia(self):
+        """
+        Tests the detect_tachycardia function from heart_rate.py
+        """
+        age = 25        
+        
+        # Test Case 1 - Has Tachycardia
+        hr1 = 200
+        output1 = hr.detect_tachycardia(hr1, age)
+        
+        self.assertEqual(output1, True, msg="Maybe you have a few too many heartbeats yourself?")
+        
+        # Test Case 2 - Does NOT
+        hr2 = 70
+        output2 = hr.detect_tachycardia(hr2, age)
+        
+        self.assertEqual(output2, False, msg="Maybe you do NOT a few too many heartbeats, but a few too many [insert insult]")
+        
+        
 if __name__ == '__main__':
     unittest.main()

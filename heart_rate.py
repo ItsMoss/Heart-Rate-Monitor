@@ -242,3 +242,35 @@ def calculate_heart_rate(beats, time):
     
     return round(hr, 2)
     
+def detect_bradycardia(heart_rate):
+    """
+    This function makes best guess as to whether bradycardia is being exhibited
+    
+    :param float heart_rate: heart rate in bpm
+    :return ble bradycardia: whether or not bradycardia detected
+    """
+    
+    hr_low = 50 # Assuming a heart rate below 50 bpm is too slow
+    
+    bradycardia = False
+    if heart_rate < hr_low:
+        bradycardia = True
+    
+    return bradycardia
+    
+def detect_tachycardia(heart_rate, age):
+    """
+    This function makes best guess as to whether tachycardia is being exhibited
+    
+    :param float heart_rate: heart rate in bpm
+    :param int age: age of user/patient
+    :return ble tachycardia: whether or not tachycardia detected
+    """
+    
+    hr_hi = round(207 - (0.7 * age), 2)
+    
+    tachycardia = False
+    if heart_rate > hr_hi:
+        tachycardia = True
+        
+    return tachycardia

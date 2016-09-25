@@ -42,8 +42,8 @@ def listAverage(input_list):
     
     numerator = 0
     for i in range(denominator):
-        if type(input_list[i]) != int:
-            print("\nList must only consist of integer values\n")
+        # if type(input_list[i]) != int:
+            # print("\nList must only consist of integer values\n")
             # raise TypeError
         numerator += input_list[i]
         
@@ -79,9 +79,9 @@ def list2numpy(input_list):
     """
     from numpy import array, int16
     
-    for x in input_list:
-        if type(x) != int:
-            print("\nYour list must contain only int values\n")
+    # for x in input_list:
+        # if type(x) != int:
+            # print("\nYour list must contain only int values\n")
             # raise TypeError
     
     np_array = array(input_list, dtype=int16)
