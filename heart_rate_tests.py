@@ -14,7 +14,7 @@ class run(unittest.TestCase):
         
         # DELETE BINARY FILE HERE
         
-        self.assertEqual(v, 18, msg="There are 10 types of people...those who know binary and those who do not!")
+        self.assertEqual(v, 1, msg="There are 10 types of people...those who know binary and those who do not!")
         self.assertEqual(b, 2, msg="You hungry? Cause these bytes do not add up :P")
         self.assertEqual(type(b), int, msg="NaN...and I don't mean that delicious Indian bread")
         
