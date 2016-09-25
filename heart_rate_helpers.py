@@ -119,3 +119,16 @@ def makeSine(time, amplitude, frequency, phase=0):
     curve = a * sin(2 * pi * f * t + p)
     return curve
             
+def makeCosine(time, amplitude, frequency, phase=0):
+    """
+    This function is for creating sine waves of varying time, amplitude, freq,
+    and phase for simulating input signals
+    """
+    from numpy import cos, pi, arange
+    t = arange(0, time, 0.01)
+    a = amplitude
+    f = frequency
+    p = phase
+    
+    curve = a * cos(2 * pi * f * t + p)
+    return curve

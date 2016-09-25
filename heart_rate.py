@@ -132,5 +132,13 @@ def normalize(signal):
     print("after: %r" % norm_signal)
     
     return norm_signal
-        
+
+def find_peaks(signal):
+    """
+    This function finds all local maxima within a given signal
+    
+    :param list signal: inut signal
+    :return int peak_count: number of peaks detected
+    """
+    pass
     

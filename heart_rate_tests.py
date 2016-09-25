@@ -143,6 +143,33 @@ class run(unittest.TestCase):
         elif test_list_2[0] < 0:
             self.assertLessEqual(output2[0], 0, msg="Not trying to be negative, but you definitely messed this up")
         
+    def test_find_peaks(self):
+        """
+        Tests the find_peaks function from heart_rate.py
+        """
+        from numpy import pi
+        
+        t = 4 * pi
+        A = 1
+        f = 1
+        
+        # Test Case 1 - Signal with 2 obvious peaks
+        test_list_1 = list(helper.makeSine(t, A, f))
+        output1 = hr.find_peaks(test_list_1)
+        
+        self.assertEqual(output1, 2, msg="If you cannot count peaks, you really need to re-think career paths")
+        
+        # Test Case 2 - Signal with 3 peaks (but 2 are the first and last value respectively)
+        test_list_2 = list(helper.makeCosine(t, A, f))
+        output2 = hr.find_peaks(test_list_2)
+        
+        self.assertEqual(output2, 3, msg="Don't forget to check the ends, they have feelings too")
+        
+        # Test Case 3 - Only DC (i.e. no peaks)
+        test_list_3 = [A for x in range(helper.myRound(t))]
+        output3 = hr.find_peaks(test_list_3)
+        
+        self.assertEqual(output3, 0, msg="Did you know that you don't need to count, to count zero times?")        
         
 if __name__ == '__main__':
     unittest.main()
