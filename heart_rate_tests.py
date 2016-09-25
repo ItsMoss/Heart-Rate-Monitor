@@ -81,6 +81,33 @@ class run(unittest.TestCase):
         
         self.assertEqual(max(output3), 5, msg="Don't be square, be aware...of your mistakes")
         
+    def test_band_stop_filter(self):
+        """
+        Tests the band_stop_filter function from heart_rate.py
+        """
+        from numpy import array, sin, pi, int16
+        twopi = 2 * pi
+        
+        # Test Case 1 - Only DC
+        test_list_1 = [10 for x in range(20)]
+        output1 = hr.band_stop_filter(test_list_1)
+        
+        self.assertListEqual(output1, test_list_1, msg="Unable to handle DC?...do you have something against Superman?")
+        
+        # Test Case 2 - ~60 Hz only
+        f62 = 62
+        test_list_2 = list(sin(array(range(20), dtype=int16) * twopi * f62))
+        output2 = hr.band_stop_filter(test_list_2)
+        
+        self.assertAlmostEqual(helper.listAverage(output2), 0, msg="You are not even stopping what you claim to be stopping...")
+        
+        # Test Case 3 - 20 Hz only
+        f20 = 20
+        test_list_3 = list(sin(array(range(20), dtype=int16) * twopi * f20))
+        output3 = hr.band_stop_filter(test_list_3)
+        
+        self.assertListEqual(output3, test_list_3, msg="This frequency should not be stopped, it should be go'ed")
+        
 
 if __name__ == '__main__':
     unittest.main()

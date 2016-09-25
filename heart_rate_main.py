@@ -41,7 +41,7 @@ def main(binary_file="test.bin",time=5, n=2):
         signals[k] = hr.no_NaNsense(signals[k])
         
     # 3. Estimate Heart Rate
-    # A) Remove DC offset and LPF together
+    # A) Remove DC offset and BPF together
     
 
     # B) Normalize Data

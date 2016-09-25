@@ -76,3 +76,14 @@ def remove_offset(signal):
     signal_clean = helper.listInts(list(signal_clean))
     
     return signal_clean
+    
+def band_stop_filter(signal, Fc=60):
+    """
+    This function filters out frequencies close to a desired cutoff Fc (in Hz).
+    The default Fc is 60 Hz as that is most common for unwanted noise
+    
+    :param list signal: input signal
+    :param int Fc: cutoff frequency in Hz
+    :return list signal_clean: cleaned up signal (i.e. filtered)
+    """
+    pass
