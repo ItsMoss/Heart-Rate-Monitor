@@ -1,6 +1,8 @@
 import heart_rate_helpers as helper
 
 EOF = "\nEnd Of File reached!\n"
+Bradycardia_detected = "Warning: Signs of bradycardia detected! Refer to heart_rate_output.txt for details.\n"
+Tachycardia_detected = "Warning: Signs of tachycardia detected! Refer to heart_rate_output.txt for details.\n"
 
 def read_data(file, read_from):
     """
@@ -274,3 +276,41 @@ def detect_tachycardia(heart_rate, age):
         tachycardia = True
         
     return tachycardia
+    
+def one_minute_update(current_time, start_time):
+    """
+    This function determines if one minute has passed between printing 1 minute
+    average heart rate, and prints 1 minute average if one minute has elapsed
+    
+    :param float current_time: the current time in seconds of program running
+    :param float start_time: time in seconds of program start
+    :param float new_start: new start time (only changes if one minute elapsed)
+    """
+    new_start = start_time    
+    
+    if current_time - start_time > 60:
+        pass
+        # print one minute average
+        new_start = current_time
+        return new_start
+        
+    return new_start    
+    
+def five_minute_update(current_time, start_time):
+    """
+    This function determines if five minutes has passed between printing 5 minute
+    average heart rate, and prints 5 minute average if five minutes has elapsed
+    
+    :param float current_time: the current time in seconds of program running
+    :param float start_time: time in seconds of program start
+    :param float new_start: new start time (only changes if fives minute elapsed)
+    """
+    new_start = start_time    
+    
+    if current_time - start_time > 300:
+        pass
+        # print five minute average
+        new_start = current_time
+        return new_start
+        
+    return new_start

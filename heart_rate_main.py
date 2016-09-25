@@ -1,14 +1,17 @@
 import heart_rate as hr
 import heart_rate_helpers as helper
 
-def main(binary_file="test.bin",time=5, n=2):
+def main(binary_file="test.bin",time=5, N=2,age=25):
     """
     This is the main file that runs the whole program
     
     :param str binary_file: name of input binary file
     :param int time: duration of time (in seconds) being read-in from binary file
     :param int n: number of signals being multiplexed
-    """    
+    """
+    from time import time
+    
+    start_time = time()
     
     b = 0 # counter for the byte number that is being read in
     
@@ -25,7 +28,7 @@ def main(binary_file="test.bin",time=5, n=2):
     samples = helper.myRound(Fs * time + 1)
     
     # C) Initialize list based on input n variable and samples
-    signals = [[0 for x in range(samples)] for x in range(n)]
+    signals = [[0 for x in range(samples)] for x in range(N)]
     
     # D) Read in data
     for i in range(samples):
@@ -42,28 +45,42 @@ def main(binary_file="test.bin",time=5, n=2):
         signals[k] = hr.no_NaNsense(signals[k])
         
     # 3. Estimate Heart Rate
-    # A) Remove DC offset and BPF together
+    # A) Remove DC offset
+    for l in range(len(signals)):
+        signals[l] = hr.remove_offset(signals[l])
     
+    # B) Band Stop Filter
+    for m in range(len(signals)):
+        signals[m] = hr.band_stop_filter(signals[m], Fs)
 
-    # B) Normalize Data
+    # C) Normalize Data
+    for n in range(len(signals)):
+        signals[n] = hr.normalize(signals[n])
 
+    # D) Count Peaks
+    peaks = [0 for x in range(N)]
+    for o in range(len(peaks)):
+        peaks[o] = hr.find_peaks(signals[o], Fs)
 
-    # C) Count Peaks
-
-
-    # D) Make an Estimation
-
+    # E) Make an Estimation
+    heart_rates = [0 for x in range(N)]
+    for p in range(len(heart_rates)):
+        heart_rates[p] = hr.calculate_heart_rate(peaks[p], time)
+        
+    HR = helper.listAverage(heart_rates)
 
     # 4. Processing of Heart Rate
     # A) Test for Bradychardia and Tachycardia
-
+    Bradycardia = hr.detect_bradycardia(HR)
+    Tachycardia = hr.detect_tachycardia(HR, age)
 
     # 5. Output
     # A) Check if 1 or 5 minute update should be printed
-
+    start_time1 = hr.one_minute_update(time(), start_time)
+    start_time5 = hr.five_minute_update(time(), start_time)
         
     # B) Write to heart_rate_output.txt
-        
+    
     
     return # NOTE. Not here yet
     # Repeat 2(D) to 5(B) making sure to update next 2 seconds worth of data
