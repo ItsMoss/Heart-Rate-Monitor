@@ -214,7 +214,33 @@ class run(unittest.TestCase):
         test_list_3 = [A for x in range(helper.myRound(t))]
         output3 = hr.find_peaks(test_list_3, Fs)
         
-        self.assertEqual(output3, 0, msg="Did you know that you don't need to count, to count zero times?")        
+        self.assertEqual(output3, 0, msg="Did you know that you don't need to count, to count zero times?")
+        
+    def test_calculate_heart_rate(self):
+        """
+        Tests the calculate_heart_rate function from heart_rate.py
+        """
+        beats1 = 8
+        beats2 = 4
+        beats3 = 14
+        time1 = 5
+        time2 = 9
+        time3 = 2
+        
+        # Test Case 1 - 8 beats
+        self.assertEqual(hr.calculate_heart_rate(beats1, time1), 96, msg="Learn how to divide 8 / 5 then multiply 60")
+        self.assertEqual(hr.calculate_heart_rate(beats1, time2), 53.33, msg="Learn how to divide 8 / 9 then multiply 60")
+        self.assertEqual(hr.calculate_heart_rate(beats1, time3), 240, msg="Learn how to divide 8 / 2 then multiply 60")
+        
+        # Test Case 2 - 4 beats
+        self.assertEqual(hr.calculate_heart_rate(beats2, time1), 48, msg="Learn how to divide 4 / 5 then multiply 60")
+        self.assertEqual(hr.calculate_heart_rate(beats2, time2), 26.67, msg="Learn how to divide 4 / 9 then multiply 60")
+        self.assertEqual(hr.calculate_heart_rate(beats2, time3), 120, msg="Learn how to divide 4 / 2 then multiply 60")        
+        
+        # Test Case 3 - 14 beats
+        self.assertEqual(hr.calculate_heart_rate(beats3, time1), 168, msg="Learn how to divide 14 / 5 then multiply 60")
+        self.assertEqual(hr.calculate_heart_rate(beats3, time2), 93.33, msg="Learn how to divide 14 / 9 then multiply 60")
+        self.assertEqual(hr.calculate_heart_rate(beats3, time3), 420, msg="Learn how to divide 14 / 2 then multiply 60")
         
 if __name__ == '__main__':
     unittest.main()

@@ -229,3 +229,16 @@ def find_peaks(signal, Fs):
     
     return peak_count
     
+def calculate_heart_rate(beats, time):
+    """
+    This function calculates heart rate (in bpm)
+    
+    :param int beats: number of detected beats
+    :param int time: number of elapsed seconds
+    :return float hr: calculated heart rate in bpm
+    """
+    
+    hr = beats / time * 60
+    
+    return round(hr, 2)
+    
