@@ -38,7 +38,7 @@ def no_NaNsense(signal):
     if len(signal) < 3:
         print("This list representing your signal is too small. Length=%d\n" % len(signal))
         raise IndexError
-    
+
     # Now let's check all values excluding the first and last indices
     for i, v in enumerate(signal):
         if i == 0 or i == len(signal) - 1:
@@ -65,25 +65,45 @@ def remove_offset(signal):
     :param list signal: input signal
     :return list signal_clean: cleaned up signal (i.e. without offset)
     """
-    from numpy import array, int16, ones, convolve
+    from numpy import int16, ones, convolve
     
-    np_signal = array(signal, dtype=int16)
+    np_signal = helper.list2numpy(signal)
     
     window = len(signal) // 5
     avg_signal = convolve(np_signal, ones(window, dtype=int16) / window, mode='same')
     signal_clean = np_signal - avg_signal
     
-    signal_clean = helper.listInts(list(signal_clean))
+    signal_clean = helper.numpy2list(signal_clean)
     
     return signal_clean
     
-def band_stop_filter(signal, Fc=60):
+def band_stop_filter(signal, Fs, Fc=60):
     """
     This function filters out frequencies close to a desired cutoff Fc (in Hz).
     The default Fc is 60 Hz as that is most common for unwanted noise
     
     :param list signal: input signal
+    :param int Fs: sampling frequency in Hz
     :param int Fc: cutoff frequency in Hz
     :return list signal_clean: cleaned up signal (i.e. filtered)
     """
-    pass
+    from scipy.signal import butter, filtfilt
+    
+    np_signal = helper.list2numpy(signal)
+    
+    # Create filter
+    nyq_f = Fs / 2
+    f_range = 10
+    f_low = (Fc - f_range) / nyq_f
+    f_hi = (Fc + f_range) / nyq_f
+    
+    b, a = butter(3, [f_low, f_hi], 'bandstop')
+    
+    # Apply filter
+    pad = len(signal) // 10
+    filt_signal = filtfilt(b, a, np_signal, padlen=pad)
+
+    signal_clean = helper.numpy2list(filt_signal)
+    
+    return signal_clean
+    

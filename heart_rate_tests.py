@@ -85,28 +85,31 @@ class run(unittest.TestCase):
         """
         Tests the band_stop_filter function from heart_rate.py
         """
-        from numpy import array, sin, pi, int16
-        twopi = 2 * pi
+        t = 20
+        A = 2
+        Fs = 500
         
         # Test Case 1 - Only DC
-        test_list_1 = [10 for x in range(20)]
-        output1 = hr.band_stop_filter(test_list_1)
+        test_list_1 = [A for x in range(t)]
+        output1 = hr.band_stop_filter(test_list_1, Fs)
         
-        self.assertListEqual(output1, test_list_1, msg="Unable to handle DC?...do you have something against Superman?")
+        diff1 = abs(helper.listAverage(output1) - helper.listAverage(test_list_1))
+        self.assertLessEqual(diff1, 0.5, msg="Unable to handle DC?...do you have something against Superman?")
         
         # Test Case 2 - ~60 Hz only
         f62 = 62
-        test_list_2 = list(sin(array(range(20), dtype=int16) * twopi * f62))
-        output2 = hr.band_stop_filter(test_list_2)
+        test_list_2 = list(helper.makeSine(t, A, f62))
+        output2 = hr.band_stop_filter(test_list_2, Fs)
         
-        self.assertAlmostEqual(helper.listAverage(output2), 0, msg="You are not even stopping what you claim to be stopping...")
+        self.assertLessEqual(abs(helper.listAverage(output2)), 0.5, msg="You are not even stopping what you claim to be stopping...")
         
         # Test Case 3 - 20 Hz only
         f20 = 20
-        test_list_3 = list(sin(array(range(20), dtype=int16) * twopi * f20))
-        output3 = hr.band_stop_filter(test_list_3)
+        test_list_3 = list(helper.makeSine(t, A, f20))
+        output3 = hr.band_stop_filter(test_list_3, Fs)
         
-        self.assertListEqual(output3, test_list_3, msg="This frequency should not be stopped, it should be go'ed")
+        diff3 = abs(helper.listAverage(output3) - helper.listAverage(test_list_3))
+        self.assertLessEqual(diff3, 0.5, msg="This frequency should not be stopped, it should be go'ed")
         
 
 if __name__ == '__main__':

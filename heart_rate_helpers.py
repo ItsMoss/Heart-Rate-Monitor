@@ -36,7 +36,7 @@ def listAverage(input_list):
     """
     if len(input_list) < 1:
         print("\nCannot take average. List has length=0\n")
-        raise IndexError
+        # raise IndexError
 
     denominator = len(input_list)
     
@@ -44,7 +44,7 @@ def listAverage(input_list):
     for i in range(denominator):
         if type(input_list[i]) != int:
             print("\nList must only consist of integer values\n")
-            raise TypeError
+            # raise TypeError
         numerator += input_list[i]
         
     average = numerator / denominator
@@ -64,9 +64,58 @@ def listInts(input_list):
             input_list[i] = int(input_list[i])
         except (TypeError, ValueError):
             print("\nValues in input list must be types int or float\n")
-            raise TypeError
+            # raise TypeError
     
     int_list = input_list
     
     return int_list
+    
+def list2numpy(input_list):
+    """
+    This function converts a list into a numpy array of int16 values
+    
+    :param list input_list: list of presumably ints
+    :return array np_array: numpy array of int16 values
+    """
+    from numpy import array, int16
+    
+    for x in input_list:
+        if type(x) != int:
+            print("\nYour list must contain only int values\n")
+            # raise TypeError
+    
+    np_array = array(input_list, dtype=int16)
+    
+    return np_array
+    
+def numpy2list(input_numpy):
+    """
+    This function converts a numpy array of int16 values to a list
+    
+    :param array input_array: numpy array of int16 values
+    :return list output_list: list of ints
+    """
+    from numpy import ndarray
+    
+    if type(input_numpy) != ndarray:
+        print("\nYour input must be a numpy array\n")
+        # raise TypeError
+    
+    output_list = listInts(list(input_numpy))
+    
+    return output_list
+    
+def makeSine(time, amplitude, frequency, phase=0):
+    """
+    This function is for creating sine waves of varying time, amplitude, freq,
+    and phase for simulating input signals
+    """
+    from numpy import sin, pi, arange
+    t = arange(0, time, 0.01)
+    a = amplitude
+    f = frequency
+    p = phase
+    
+    curve = a * sin(2 * pi * f * t + p)
+    return curve
             
