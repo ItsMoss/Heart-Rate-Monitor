@@ -1,8 +1,9 @@
 import heart_rate_helpers as helper
 
 EOF = "\nEnd Of File reached!\n"
-Bradycardia_detected = "Warning: Signs of bradycardia detected! Refer to heart_rate_output.txt for details.\n"
-Tachycardia_detected = "Warning: Signs of tachycardia detected! Refer to heart_rate_output.txt for details.\n"
+Bradycardia_detected = "\nWarning: Signs of bradycardia detected! Refer to heart_rate_output.txt for details.\n"
+Tachycardia_detected = "\nWarning: Signs of tachycardia detected! Refer to heart_rate_output.txt for details.\n"
+Output_filename = "heart_rate_output"
 
 def read_data(file, read_from):
     """
@@ -277,16 +278,17 @@ def detect_tachycardia(heart_rate, age):
         
     return tachycardia
     
-def one_minute_update(current_time, start_time):
+def one_minute_update(current_time, start_time, avg_hr):
     """
     This function determines if one minute has passed between printing 1 minute
     average heart rate, and prints 1 minute average if one minute has elapsed
     
     :param float current_time: the current time in seconds of program running
     :param float start_time: time in seconds of program start
-    :param float new_start: new start time (only changes if one minute elapsed)
+    :param int avg_hr: total beats count for passed minute
+    :return float new_start: new start time (only changes if one minute elapsed)
     """
-    new_start = start_time    
+    new_start = start_time
     
     if current_time - start_time > 60:
         pass
@@ -294,18 +296,19 @@ def one_minute_update(current_time, start_time):
         new_start = current_time
         return new_start
         
-    return new_start    
+    return new_start
     
-def five_minute_update(current_time, start_time):
+def five_minute_update(current_time, start_time, avg_hr):
     """
     This function determines if five minutes has passed between printing 5 minute
     average heart rate, and prints 5 minute average if five minutes has elapsed
     
     :param float current_time: the current time in seconds of program running
     :param float start_time: time in seconds of program start
-    :param float new_start: new start time (only changes if fives minute elapsed)
+    :param int avg_hr: total beats count for passed 5 minutes
+    :return float new_start: new start time (only changes if five minutes elapsed)
     """
-    new_start = start_time    
+    new_start = start_time
     
     if current_time - start_time > 300:
         pass
@@ -314,3 +317,87 @@ def five_minute_update(current_time, start_time):
         return new_start
         
     return new_start
+    
+def init_output_file(filename, name):
+    """
+    This function initializes an output file for continuous log of heart rate
+    data for a user/patient (in .txt format)
+    
+    :param str filename: desired name for output file (without file extension)
+    :param str name: name of the user/patient
+    """
+    
+    with open(filename+".txt", 'w') as f:
+        f.write("This file is a continuous Heart Rate log for "+name+"\n\n")
+        
+def write_inst_to_file(filename, time, hr):
+    """
+    This function writes instantaneous heart rate to output file and also
+    prints same informtion to terminal
+    
+    :param str filename: output file name
+    :param float time: current time in seconds
+    :param float hr: calculated instantaneous heart rate in bpm
+    """    
+    write_line = "time=%.2f s   |   heart rate=%.2f bpm\n" % (time, hr)
+    
+    print(write_line)
+    
+    with open(filename+".txt", 'a') as f:
+        f.write(write_line)
+        
+def write_min_to_file(filename, hr, minutes='one'):
+    """
+    This function writes one and five minute averages to output file and also
+    prints same information to terminal
+    
+    :param str filename: output file name
+    :param float hr: calculated average heart rate
+    :param str minutes: minutes for which average is being printed for
+    """
+    if minutes == 'one' or minutes == 'five':
+        write_line = "\n"+minutes+"-minute average=%.2f bpm\n" % (hr)
+        
+        print(write_line)
+        
+        with open(filename+".txt", 'a') as f:
+            f.write(write_line)
+            
+def write_flag_to_file(filename, bradycardia, tachycardia):
+    """
+    This function writes flag to output file for if bradycardia or tachycardia
+    was detected and prints corresponding information to terminal
+    
+    :param str filename: output file name
+    :param ble bradycardia: whether or not bradycardia detected
+    :param ble tachycardia: whether or not tachycardia detected
+    """
+    
+    if bradycardia == True:
+        with open(filename+".txt", 'a') as f:
+            f.write(Bradycardia_detected)
+            
+        print(Bradycardia_detected)
+        
+    if tachycardia == True:
+        with open(filename+".txt", 'a') as f:
+            f.write(Tachycardia_detected)
+            
+        print(Tachycardia_detected)
+        
+def shift_signal_buff(signals, Fs, t=2):
+    """
+    This function shifts the signal buffer list by the amount of samples
+    corresponding to time t
+    
+    :param list signals: the signals buffer
+    :param int Fs: sampling frequency in Hz
+    :param int t: time to shift by in seconds
+    :return list new_signals: updated signals buffer
+    """
+    remove_buffer = Fs * t
+    pad = [0 for x in range(remove_buffer)]
+    
+    new_signals = signals[remove_buffer:-1] + pad
+    
+    return new_signals

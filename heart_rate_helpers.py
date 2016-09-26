@@ -178,3 +178,4 @@ def dotProduct(list1, list2):
         dp += list1[i] * list2[i]
         
     return dp
+    
