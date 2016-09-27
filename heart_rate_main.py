@@ -1,7 +1,8 @@
 import heart_rate as hr
 import heart_rate_helpers as helper
+from sys import argv
 
-def main(binary_file="test.bin", read_time=5, N=2, age=25, name="Assignment 02"):
+def main():
     """
     This is the main file that runs the whole program
     
@@ -9,6 +10,16 @@ def main(binary_file="test.bin", read_time=5, N=2, age=25, name="Assignment 02")
     :param int time: duration of time (in seconds) being read-in from binary file
     :param int n: number of signals being multiplexed
     """
+    
+    # READ IN COMMNAD LINE ARGUMENTS
+    main_args = hr.parse_command_line_args()
+    
+    binary_file = main_args["binary_file"]
+    name = main_args["user_name"]
+    read_time = main_args["read_time"]    
+    age = main_args["user_age"]
+    N = main_args["N_multiplex"]
+    
     # NOTE. Initialize the output file before anything else
     hr.init_output_file(hr.Output_filename, name)
     

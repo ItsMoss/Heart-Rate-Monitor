@@ -5,6 +5,41 @@ Bradycardia_detected = "\nWarning: Signs of bradycardia detected! Refer to heart
 Tachycardia_detected = "\nWarning: Signs of tachycardia detected! Refer to heart_rate_output.txt for details.\n"
 Output_filename = "heart_rate_output"
 
+def parse_command_line_args():
+    """
+    This function parses command line arguments and returns them
+    
+    :return list args:
+    """
+    from argparse import ArgumentParser
+    
+    parser = ArgumentParser(description = "Command line argument parser for heart_rate_main.py")
+    
+    parser.add_argument("--binary_file",
+                        help = "Input binary file",
+                        type = str,
+                        default = "test.bin")
+    parser.add_argument("--user_name",
+                        help = "Full name of the user",
+                        type = str,
+                        default = "Assignment 02")
+    parser.add_argument("--user_age",
+                        help = "Age of the user",
+                        type = int,
+                        default = 25)
+    parser.add_argument("--read_time",
+                        help = "Amount of time in seconds to calculate heart rate on",
+                        type = int,
+                        default = 5)
+    parser.add_argument("--N_multiplex",
+                        help = "Amount of signals being multiplexed in binary file",
+                        type = int,
+                        default = 2)
+                        
+    args = parser.parse_args()
+    
+    return vars(args)
+
 def read_data(file, read_from):
     """
     This function reads in a single byte from a binary file and converts it to
