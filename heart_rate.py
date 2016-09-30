@@ -247,8 +247,8 @@ def find_peaks(signal, Fs):
     dc = signal[0]
     i = 0
     while dc == signal[i]:
-        dc = signal[i]
         i += 1
+        dc = signal[i]
         if i == len(signal) - 1:
             return 0
     
