@@ -60,7 +60,7 @@ def read_data(file, read_from):
         except TypeError:
             v = None
         
-    return v, read_from + 1
+    return v, read_from + 2
 
 def no_NaNsense(signal):
     """
