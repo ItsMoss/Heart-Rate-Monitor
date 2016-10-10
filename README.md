@@ -1,4 +1,4 @@
-# Assignment 02
+# Assignment 02 & 03
 By: Moseph Jackson-Atogi
 
 The following documents lists and outlines all files for BME590 Assignemnt02, in which a code for a heart rate monitor was developed in Python 3.5. Directions for how to run the program properly are also included.
