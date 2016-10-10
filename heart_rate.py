@@ -9,7 +9,7 @@ def parse_command_line_args():
     """
     This function parses command line arguments and returns them
     
-    :return list args:
+    :return object args: contains all parsed command line arguments
     """
     import argparse as argp
     
@@ -259,7 +259,6 @@ def find_peaks(signal, Fs):
     :param list signal: inut signal
     :return int peak_count: number of peaks detected
     """
-    
     L = len(signal)
     threshold = 0.6 * max(signal)
     peak_count = 0
@@ -270,10 +269,9 @@ def find_peaks(signal, Fs):
     i = 0
     while dc == signal[i]:
         i += 1
-        dc = signal[i]
         if i == len(signal) - 1:
             return 0
-    
+
     # Look for changes from above to below the threshold
     for j in range(L - 1):
         if signal[j] > threshold:
