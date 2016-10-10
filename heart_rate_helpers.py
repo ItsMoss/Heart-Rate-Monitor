@@ -49,7 +49,7 @@ def listAverage(input_list):
         
     average = numerator / denominator
     
-    return average
+    return round(average, 2)
     
 def listInts(input_list):
     """

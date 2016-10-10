@@ -17,7 +17,7 @@ class run(unittest.TestCase):
         
         # Test Case 1 - Accurate output values
         self.assertEqual(v, 1, msg="There are 10 types of people...those who know binary and those who do not!")
-        self.assertEqual(b, 1, msg="You hungry? Cause these bytes do not add up :P")
+        self.assertEqual(b, 2, msg="You hungry? Cause these bytes do not add up :P")
         
         # Test Case 2 - Correct output type
         self.assertEqual(type(b), int, msg="NaN...and I don't mean that delicious Indian bread")

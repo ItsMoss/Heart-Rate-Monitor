@@ -1,7 +1,8 @@
 import heart_rate as hr
 import heart_rate_helpers as helper
+from sys import argv
 
-def main(binary_file="test.bin", read_time=5, N=2, age=25, name="Assignment 02"):
+def main():
     """
     This is the main file that runs the whole program
     
@@ -9,6 +10,18 @@ def main(binary_file="test.bin", read_time=5, N=2, age=25, name="Assignment 02")
     :param int time: duration of time (in seconds) being read-in from binary file
     :param int n: number of signals being multiplexed
     """
+    
+    # READ IN COMMNAD LINE ARGUMENTS
+    main_args = hr.parse_command_line_args()
+
+    binary_file = main_args.binary_file
+    name = main_args.name
+    read_time = main_args.read_time
+    age = main_args.age
+    N = main_args.N
+    N_used = main_args.n_sig_used
+
+    
     # NOTE. Initialize the output file before anything else
     hr.init_output_file(hr.Output_filename, name)
     
@@ -71,8 +84,8 @@ def main(binary_file="test.bin", read_time=5, N=2, age=25, name="Assignment 02")
     heart_rates = [0 for x in range(N)]
     for p in range(len(heart_rates)):
         heart_rates[p] = hr.calculate_heart_rate(peaks[p], read_time)
-        
-    HR = helper.listAverage(heart_rates)
+    
+    HR = hr.calc_hr_with_n_sig(heart_rates, N_used)
 
     # 4. Processing of Heart Rate
     # A) Test for Bradychardia and Tachycardia
@@ -130,16 +143,14 @@ def main(binary_file="test.bin", read_time=5, N=2, age=25, name="Assignment 02")
             signals[n] = hr.normalize(signals[n])
     
         # D) Count Peaks
-        peaks = [0 for x in range(N)]
         for o in range(len(peaks)):
             peaks[o] = hr.find_peaks(signals[o], Fs)
     
         # E) Make an Estimation
-        heart_rates = [0 for x in range(N)]
         for p in range(len(heart_rates)):
             heart_rates[p] = hr.calculate_heart_rate(peaks[p], read_time)
             
-        HR = helper.listAverage(heart_rates)
+        HR = hr.calc_hr_with_n_sig(heart_rates, N_used)
     
         # 4. Processing of Heart Rate
         # A) Test for Bradychardia and Tachycardia
