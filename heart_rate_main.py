@@ -13,12 +13,14 @@ def main():
     
     # READ IN COMMNAD LINE ARGUMENTS
     main_args = hr.parse_command_line_args()
-    
-    binary_file = main_args["binary_file"]
-    name = main_args["user_name"]
-    read_time = main_args["read_time"]    
-    age = main_args["user_age"]
-    N = main_args["N_multiplex"]
+
+    binary_file = main_args.binary_file
+    name = main_args.name
+    read_time = main_args.read_time
+    age = main_args.age
+    N = main_args.N
+    N_used = main_args.n_sig_used
+
     
     # NOTE. Initialize the output file before anything else
     hr.init_output_file(hr.Output_filename, name)
@@ -82,8 +84,8 @@ def main():
     heart_rates = [0 for x in range(N)]
     for p in range(len(heart_rates)):
         heart_rates[p] = hr.calculate_heart_rate(peaks[p], read_time)
-        
-    HR = helper.listAverage(heart_rates)
+    
+    HR = hr.calc_hr_with_n_sig(heart_rates, N_used)
 
     # 4. Processing of Heart Rate
     # A) Test for Bradychardia and Tachycardia
@@ -141,16 +143,14 @@ def main():
             signals[n] = hr.normalize(signals[n])
     
         # D) Count Peaks
-        peaks = [0 for x in range(N)]
         for o in range(len(peaks)):
             peaks[o] = hr.find_peaks(signals[o], Fs)
     
         # E) Make an Estimation
-        heart_rates = [0 for x in range(N)]
         for p in range(len(heart_rates)):
             heart_rates[p] = hr.calculate_heart_rate(peaks[p], read_time)
             
-        HR = helper.listAverage(heart_rates)
+        HR = hr.calc_hr_with_n_sig(heart_rates, N_used)
     
         # 4. Processing of Heart Rate
         # A) Test for Bradychardia and Tachycardia

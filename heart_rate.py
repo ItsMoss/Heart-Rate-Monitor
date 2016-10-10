@@ -11,34 +11,56 @@ def parse_command_line_args():
     
     :return list args:
     """
-    from argparse import ArgumentParser
+    import argparse as argp
     
-    parser = ArgumentParser(description = "Command line argument parser for heart_rate_main.py")
+    parser = argp.ArgumentParser(description = "Command line argument parser for heart_rate_main.py")
     
     parser.add_argument("--binary_file",
+                        dest = "binary_file",
                         help = "Input binary file",
                         type = str,
                         default = "test.bin")
     parser.add_argument("--user_name",
+                        dest = "name",
                         help = "Full name of the user",
                         type = str,
                         default = "Assignment 02")
     parser.add_argument("--user_age",
+                        dest = "age",
                         help = "Age of the user",
                         type = int,
                         default = 25)
     parser.add_argument("--read_time",
+                        dest = "read_time",
                         help = "Amount of time in seconds to calculate heart rate on",
                         type = int,
                         default = 5)
     parser.add_argument("--N_multiplex",
+                        dest = "N",
                         help = "Amount of signals being multiplexed in binary file",
+                        type = int,
+                        default = 2)
+    parser.add_argument("--N_used",
+                        dest = "n_sig_used",
+                        help = "The signal being used to estimate heart rate, starting from 0. If greater than or equal to N_multiplex all signals are used.",
                         type = int,
                         default = 2)
                         
     args = parser.parse_args()
+
+    # Let's check for some errors real quick
+    # 1. N_multiplex cannot be less than 1
+    if args.N < 1:
+        print("Command line argument error! N_multiplex cannot be less than 1.\n")
+        raise ValueError     
+    # 2. N_used cannot be less than 0...and if it is greater than N_multiplex
+    if args.n_sig_used < 0:
+        print("Command line argument error! N_used cannot be less than 0.\n")
+        raise ValueError
+    elif args.n_sig_used > args.N:
+    	args.n_sig_used = args.N
     
-    return vars(args)
+    return args
 
 def read_data(file, read_from):
     """
@@ -326,7 +348,6 @@ def one_minute_update(current_time, start_time, avg_hr):
     new_start = start_time
     
     if current_time - start_time > 60:
-        pass
         # print one minute average
         new_start = current_time
         return new_start
@@ -346,7 +367,6 @@ def five_minute_update(current_time, start_time, avg_hr):
     new_start = start_time
     
     if current_time - start_time > 300:
-        pass
         # print five minute average
         new_start = current_time
         return new_start
@@ -436,3 +456,25 @@ def shift_signal_buff(signals, Fs, t=2):
     new_signals = signals[remove_buffer:-1] + pad
     
     return new_signals
+
+def calc_hr_with_n_sig(heart_rates, n):
+    """
+    This function determines the heart rate using a user-specified amount of
+    signals
+    
+    :param list heart_rates: a list of the calculated heart rates for all signals
+    :param int n: the signal number that one wishes to use to calculate HR (bpm)
+    :return float hr: calculated HR (in bpm)
+    """
+    N = len(heart_rates)
+    
+    if n == N:
+        hr = helper.listAverage(heart_rates)
+    else:
+        try:
+            hr = heart_rates[n]
+        except IndexError:
+            print("An error occurred trying to use signal #%d to calculate heart rate!" % n)
+            hr = helper.listAverage(heart_rates)
+            
+    return round(hr, 2)
