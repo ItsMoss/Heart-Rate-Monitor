@@ -18,32 +18,32 @@ def parse_command_line_args():
 
     parser.add_argument("--binary_file",
                         dest="binary_file",
-                        help="Input binary file",
+                        help="Input binary file. DEFAULT=test.bin",
                         type=str,
                         default="test.bin")
     parser.add_argument("--user_name",
                         dest="name",
-                        help="Full name of the user",
+                        help="Full name of the user. DEFAULT=Assignment 03",
                         type=str,
-                        default="Assignment 02")
+                        default="Assignment 03")
     parser.add_argument("--user_age",
                         dest="age",
-                        help="Age of the user",
+                        help="Age of the user. DEFAULT=25",
                         type=int,
                         default=25)
     parser.add_argument("--read_time",
                         dest="read_time",
-                        help="Amount of time in seconds to calculate heart rate on",
+                        help="Amount of time in seconds to calculate heart rate on. DEFAULT=5 (note, 5 is the minimum allowed)",
                         type=int,
                         default=5)
     parser.add_argument("--N_multiplex",
                         dest="N",
-                        help="Amount of signals being multiplexed in binary file",
+                        help="Amount of signals being multiplexed in binary file. DEFAULT=2",
                         type=int,
                         default=2)
     parser.add_argument("--N_used",
                         dest="n_sig_used",
-                        help="The signal being used to estimate heart rate, starting from 0. If greater than or equal to N_multiplex all signals are used.",
+                        help="The signal being used to estimate heart rate, starting from 0. If greater than or equal to N_multiplex all signals are used. DEFAULT=2",
                         type=int,
                         default=2)
 
