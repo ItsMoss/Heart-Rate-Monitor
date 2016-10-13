@@ -193,7 +193,7 @@ class run(unittest.TestCase):
         self.assertEqual(output2[-1], test_var2b, msg="Something at the end of your cross correlation is way off the mark...cuban")
 
 
-def test_find_peaks(self):
+    def test_find_peaks(self):
         """
         Tests the find_peaks function from heart_rate.py
         """
@@ -224,7 +224,7 @@ def test_find_peaks(self):
         self.assertEqual(output3, 0, msg="Did you know that you don't need to count, to count zero times?")
 
 
-def test_calculate_heart_rate(self):
+    def test_calculate_heart_rate(self):
         """
         Tests the calculate_heart_rate function from heart_rate.py
         """
