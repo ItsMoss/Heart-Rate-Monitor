@@ -224,7 +224,7 @@ def test_find_peaks(self):
         self.assertEqual(output3, 0, msg="Did you know that you don't need to count, to count zero times?")
 
 
-    def test_calculate_heart_rate(self):
+def test_calculate_heart_rate(self):
         """
         Tests the calculate_heart_rate function from heart_rate.py
         """
