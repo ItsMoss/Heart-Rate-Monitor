@@ -1,8 +1,10 @@
 import heart_rate_helpers as helper
 
 EOF = "\nEnd Of File reached!\n"
-Bradycardia_detected = "\nWarning: Signs of bradycardia detected! Refer to heart_rate_output.txt for details.\n"
-Tachycardia_detected = "\nWarning: Signs of tachycardia detected! Refer to heart_rate_output.txt for details.\n"
+Bradycardia_detected = "\nWarning: Signs of bradycardia detected! Refer to hea\
+rt_rate_output.txt for details.\n"
+Tachycardia_detected = "\nWarning: Signs of tachycardia detected! Refer to hea\
+rt_rate_output.txt for details.\n"
 Output_filename = "heart_rate_output"
 
 
@@ -14,7 +16,8 @@ def parse_command_line_args():
     """
     import argparse as argp
 
-    parser = argp.ArgumentParser(description = "Command line argument parser for heart_rate_main.py")
+    parser = argp.ArgumentParser(description="Command line argument parser for\
+    heart_rate_main.py")
 
     parser.add_argument("--binary_file",
                         dest="binary_file",
@@ -33,17 +36,21 @@ def parse_command_line_args():
                         default=25)
     parser.add_argument("--read_time",
                         dest="read_time",
-                        help="Amount of time in seconds to calculate heart rate on. DEFAULT=5 (note, 5 is the minimum allowed)",
+                        help="Amount of time in seconds to calculate heart rat\
+                        e on. DEFAULT=5 (note, 5 is the minimum allowed)",
                         type=int,
                         default=5)
     parser.add_argument("--N_multiplex",
                         dest="N",
-                        help="Amount of signals being multiplexed in binary file. DEFAULT=2",
+                        help="Amount of signals being multiplexed in binary fi\
+                        le. DEFAULT=2",
                         type=int,
                         default=2)
     parser.add_argument("--N_used",
                         dest="n_sig_used",
-                        help="The signal being used to estimate heart rate, starting from 0. If greater than or equal to N_multiplex all signals are used. DEFAULT=2",
+                        help="The signal being used to estimate heart rate, st\
+                        arting from 0. If greater than or equal to N_multiplex\
+                        all signals are used. DEFAULT=2",
                         type=int,
                         default=2)
 
@@ -52,14 +59,15 @@ def parse_command_line_args():
     # Let's check for some errors real quick
     # 1. N_multiplex cannot be less than 1
     if args.N < 1:
-        print("Command line argument error! N_multiplex cannot be less than 1.\n")
+        print("Command line argument error! N_multiplex cannot be less than 1.\
+        \n")
         raise ValueError
     # 2. N_used cannot be less than 0...and if it is greater than N_multiplex
     if args.n_sig_used < 0:
         print("Command line argument error! N_used cannot be less than 0.\n")
         raise ValueError
     elif args.n_sig_used > args.N:
-    	args.n_sig_used = args.N
+        args.n_sig_used = args.N
 
     return args
 
@@ -99,7 +107,8 @@ def no_NaNsense(signal):
 
     # Firstly, let's check that the length of the list is greater than 2
     if len(signal) < 3:
-        print("This list representing your signal is too small. Length=%d\n" % len(signal))
+        print("This list representing your signal is too small. Length=%d\n\
+        " % len(signal))
         raise IndexError
 
     # Now let's check all values excluding the first and last indices
@@ -134,7 +143,8 @@ def remove_offset(signal):
     np_signal = helper.list2numpy(signal)
 
     window = len(signal) // 5
-    avg_signal = convolve(np_signal, ones(window, dtype=int16) / window, mode='same')
+    avg_signal = convolve(np_signal, ones(window, dtype=int16)/window,
+                          mode='same')
     signal_clean = np_signal - avg_signal
 
     signal_clean = helper.numpy2list(signal_clean)
@@ -415,7 +425,7 @@ def write_inst_to_file(filename, time, hr):
     with open(filename+".txt", 'a') as f:
         f.write(write_line)
 
-    
+
 def write_min_to_file(filename, hr, minutes='one'):
     """
     This function writes one and five minute averages to output file and also
@@ -492,7 +502,8 @@ def calc_hr_with_n_sig(heart_rates, n):
         try:
             hr = heart_rates[n]
         except IndexError:
-            print("An error occurred trying to use signal #%d to calculate heart rate!" % n)
+            print("An error occurred trying to use signal #%d to calculate hea\
+            rt rate!" % n)
             hr = helper.listAverage(heart_rates)
 
     return round(hr, 2)
