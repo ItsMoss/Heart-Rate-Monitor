@@ -12,16 +12,19 @@ class run(unittest.TestCase):
         # CREATE BINARY FILE HERE
         binary_file = "test.bin"
 
-        v, b = hr.read_data(binary_file, 0)
+        v1, b1 = hr.read_data(binary_file, 0)
+        v2, b2 = hr.read_data(binary_file, b1)
 
         # DELETE BINARY FILE HERE
 
         # Test Case 1 - Accurate output values
-        self.assertEqual(v, 1, msg="There are 10 types of people...those who know binary and those who do not!")
-        self.assertEqual(b, 2, msg="You hungry? Cause these bytes do not add up :P")
+        self.assertEqual(v1, 1, msg="There are 10 types of people...those who know binary and those who do not!")
+        self.assertEqual(v2, 4, msg="there are 2 types of people...those who do not know anything but decimal and others!")
+        self.assertEqual(b1, 2, msg="You hungry? Cause these bytes do not add up :P")
+        self.assertEqual(b2, 4, msg="The number four (4) is a beautiful number")
 
         # Test Case 2 - Correct output type
-        self.assertEqual(type(b), int, msg="NaN...and I don't mean that delicious Indian bread")
+        self.assertEqual(type(v1), int, msg="NaN...and I don't mean that delicious Indian bread")
 
     def test_no_NaNsense(self):
         """
