@@ -2,12 +2,13 @@ import heart_rate as hr
 import heart_rate_helpers as helper
 from sys import argv
 
+
 def main():
     """
     This is the main file that runs the whole program
 
     :param str binary_file: name of input binary file
-    :param int time: duration of time (in seconds) being read-in from binary file
+    :param int time: duration of time (in sec) being read-in from binary file
     :param int n: number of signals being multiplexed
     """
 
@@ -57,7 +58,7 @@ def main():
             signals[j][i] = v
             signals_buffer[j][i] = v
 
-    # E) Check for NaNs    
+    # E) Check for NaNs
     for k in range(len(signals)):
         signals[k] = hr.no_NaNsense(signals[k])
 
@@ -99,7 +100,7 @@ def main():
     one_sum = HR
     five_sum = HR
     start_time1, one_sum = hr.one_minute_update(time(), start_time, one_sum)
-    start_time5, five_sum = hr.five_minute_update(time(), start_time, five_sum)   
+    start_time5, five_sum = hr.five_minute_update(time(), start_time, five_sum)
 
     # C) Write bradycardia/tachycardia warnings to output file
     hr.write_flag_to_file(hr.Output_filename, Bradycardia, Tachycardia)
@@ -110,7 +111,8 @@ def main():
     loop_count = 1
     while True:
         for q in range(len(signals_buffer)):
-            signals_buffer[q] = hr.shift_signal_buff(signals_buffer[q], Fs, t_cycle)
+            signals_buffer[q] = hr.shift_signal_buff(signals_buffer[q], Fs,
+                                                     t_cycle)
         signals = signals_buffer
 
         # 2D) Read in data
@@ -163,8 +165,10 @@ def main():
         # B) Check if 1 or 5 minute update should be printed
         one_sum += HR
         five_sum += HR
-        start_time1, one_sum = hr.one_minute_update(time(), start_time1, one_sum / loop_count)
-        start_time5, five_sum = hr.five_minute_update(time(), start_time5, five_sum / loop_count)   
+        start_time1, one_sum = hr.one_minute_update(time(), start_time1,
+                                                    one_sum / loop_count)
+        start_time5, five_sum = hr.five_minute_update(time(), start_time5,
+                                                      five_sum / loop_count)
 
         # C) Write bradycardia/tachycardia warnings to output file
         hr.write_flag_to_file(hr.Output_filename, Bradycardia, Tachycardia)
