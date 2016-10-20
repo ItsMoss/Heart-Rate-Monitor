@@ -21,9 +21,10 @@ def main():
     age = main_args.age
     N = main_args.N
     N_used = main_args.n_sig_used
+    log_level = main_args.log_level
 
-    # NOTE. Initialize the output file before anything else
-    hr.init_output_file(hr.Output_filename, name)
+    # NOTE. Initialize the output (logging) file before anything else
+    hr.init_output_file(hr.Output_filename, name, log_level)
 
     from time import time
 

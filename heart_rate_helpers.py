@@ -181,3 +181,10 @@ def dotProduct(list1, list2):
         dp += list1[i] * list2[i]
 
     return dp
+
+
+logDict = {"DEBUG": 10,
+           "INFO": 20,
+           "WARNING": 30,
+           "ERROR": 40,
+           "CRITICAL": 50}
