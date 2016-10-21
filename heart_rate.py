@@ -1,5 +1,4 @@
 import heart_rate_helpers as helper
-import logging as logg
 
 EOF = "\nEnd Of File reached!\n"
 Bradycardia_detected = "\nWarning: Signs of bradycardia detected! Refer to hea\
@@ -15,7 +14,8 @@ def parse_command_line_args():
 
     :return object args: contains all parsed command line arguments
     """
-    log_debug("Parsing command line arguments.\n")
+    import logging as log
+    log.debug("Parsing command line arguments.\n")
 
     import argparse as argp
 
@@ -92,7 +92,8 @@ def read_data(file, read_from):
     :return int v: the integer value of the byte read
     :return int read_from + 2: represents the next byte number to be read
     """
-    log_debug("Reading in data.\n")
+    import logging as log
+    log.debug("Reading in data.\n")
 
     with open(file, 'rb') as f:
         f.seek(read_from)
@@ -116,13 +117,14 @@ def no_NaNsense(signal):
     :param list signal: a list
     :return list signal_no_nan: list without any NaN's
     """
-    log_debug("Removing NaNs from signal.\n")
+    import logging as log
+    log.debug("Removing NaNs from signal.\n")
 
     # Firstly, let's check that the length of the list is greater than 2
     if len(signal) < 3:
         errormsg = "This list representing your signal is too small. Length=%d\
         \n" % len(signal)
-        logg.error(errormsg)
+        log.error(errormsg)
         print(errormsg)
         raise IndexError
 
@@ -153,7 +155,8 @@ def remove_offset(signal):
     :param list signal: input signal
     :return list signal_clean: cleaned up signal (i.e. without offset)
     """
-    log_debug("Removing DC offset.\n")
+    import logging as log
+    log.debug("Removing DC offset.\n")
 
     from numpy import int16, ones, convolve
 
@@ -179,7 +182,8 @@ def band_stop_filter(signal, Fs, Fc=60):
     :param int Fc: cutoff frequency in Hz
     :return list signal_clean: cleaned up signal (i.e. filtered)
     """
-    log_debug("Applying band stop filter.\n")
+    import logging as log
+    log.debug("Applying band stop filter.\n")
 
     from scipy.signal import butter, filtfilt
 
@@ -209,7 +213,8 @@ def normalize(signal):
     :param list signal: input signal
     :return list norm_signal: normalized signal
     """
-    log_debug("Normalizing signal.\n")
+    import logging as log
+    log.debug("Normalizing signal.\n")
 
     # Let's find the maximum and minimum values
     maximum = max(signal)
@@ -240,7 +245,8 @@ def make_QRS_kernel(Fs, amplitude=1):
     :param int amplitude: amplitude of spike
     :return list kernel: calculated QRS kernel
     """
-    log_debug("Creating transient QRS kernel.\n")
+    import logging as log
+    log.debug("Creating transient QRS kernel.\n")
 
     # Initialize list based off of Fs
     t = 0.10   # QRS time-length
@@ -249,7 +255,7 @@ def make_QRS_kernel(Fs, amplitude=1):
     if samples < 3:
         errormsg = "\nSampling frequency is ridiculously low\n"
         print(errormsg)
-        logg.error(errormsg)
+        log.error(errormsg)
         raise IndexError  # This really should not happen
 
     kernel = [0 for x in range(samples)]
@@ -279,12 +285,13 @@ def cross_correlate(signal, kernel):
     :param list kernel: input kernel
     :return list x_coeffs: list of calculated cross correlation coefficients
     """
-    log_debug("Cross correlating signal and kernel.\n")
+    import logging as log
+    log.debug("Cross correlating signal and kernel.\n")
 
     if len(kernel) >= len(signal):
         errormsg = "\nKernel length cannot be greater than signal length\n"
         print(errormsg)
-        logg.error(errormsg)
+        log.error(errormsg)
         raise IndexError
 
     # Initialize correlation coefficients list
@@ -307,7 +314,8 @@ def find_peaks(signal, Fs):
     :param list signal: inut signal
     :return int peak_count: number of peaks detected
     """
-    log_debug("Finding peaks in signal.\n")
+    import logging as log
+    log.debug("Finding peaks in signal.\n")
 
     L = len(signal)
     threshold = 0.6 * max(signal)
@@ -346,7 +354,8 @@ def calculate_heart_rate(beats, time):
     :param int time: number of elapsed seconds
     :return float hr: calculated heart rate in bpm
     """
-    log_debug("Calculating heart rate.\n")
+    import logging as log
+    log.debug("Calculating heart rate.\n")
 
     hr = beats / time * 60
 
@@ -360,7 +369,8 @@ def detect_bradycardia(heart_rate):
     :param float heart_rate: heart rate in bpm
     :return ble bradycardia: whether or not bradycardia detected
     """
-    log_debug("Checking for bradycardia.\n")
+    import logging as log
+    log.debug("Checking for bradycardia.\n")
 
     hr_low = 50  # Assuming a heart rate below 50 bpm is too slow
 
@@ -379,7 +389,8 @@ def detect_tachycardia(heart_rate, age):
     :param int age: age of user/patient
     :return ble tachycardia: whether or not tachycardia detected
     """
-    log_debug("Checking for tachycardia.\n")
+    import logging as log
+    log.debug("Checking for tachycardia.\n")
 
     hr_hi = round(207 - (0.7 * age), 2)
 
@@ -400,12 +411,13 @@ def one_minute_update(current_time, start_time, avg_hr):
     :param int avg_hr: total beats count for passed minute
     :return float new_start: new start time (only change if one minute elapsed)
     """
-    log_debug("Checking if one-minute average should be calculated.\n")
+    import logging as log
+    log.debug("Checking if one-minute average should be calculated.\n")
 
     new_start = start_time
 
     if current_time - start_time > 60:
-        log_debug("Calculating one-minute average.\n")
+        log.debug("Calculating one-minute average.\n")
 
         # print one minute average
         new_start = current_time
@@ -424,12 +436,13 @@ def five_minute_update(current_time, start_time, avg_hr):
     :param int avg_hr: total beats count for passed 5 minutes
     :return float new_start: new start time(only change if five minute elapsed)
     """
-    log_debug("Checking if five-minute average should be calculated.\n")
+    import logging as log
+    log.debug("Checking if five-minute average should be calculated.\n")
 
     new_start = start_time
 
     if current_time - start_time > 300:
-        log_debug("Calculating five-minute average.\n")
+        log.debug("Calculating five-minute average.\n")
 
         # print five minute average
         new_start = current_time
@@ -447,10 +460,11 @@ def init_output_file(fname, name, log_level):
     :param str name: name of the user/patient
     :param str log_level: the desired level of logging for the output file
     """
+    import logging as log
 
-    logg.basicConfig(filename=fname+'.log', level=helper.logDict[log_level])
+    log.basicConfig(filename=fname+'.log', level=helper.logDict[log_level])
     message = "This file is a continuous Heart Rate log for "+name+"\n"
-    logg.info(message)
+    log.info(message)
 
     return
 
@@ -464,11 +478,12 @@ def write_inst_to_file(filename, time, hr):
     :param float time: current time in seconds
     :param float hr: calculated instantaneous heart rate in bpm
     """
+    import logging as log
     write_line = "time=%.2f s   |   heart rate=%.2f bpm\n" % (time, hr)
 
     print(write_line)
 
-    logg.info(write_line)
+    log.info(write_line)
 
     return
 
@@ -483,11 +498,12 @@ def write_min_to_file(filename, hr, minutes='one'):
     :param str minutes: minutes for which average is being printed for
     """
     if minutes == 'one' or minutes == 'five':
+        import logging as log
         write_line = "\n"+minutes+"-minute average=%.2f bpm\n" % (hr)
 
         print(write_line)
 
-        logg.info(write_line)
+        log.info(write_line)
 
     return
 
@@ -503,12 +519,14 @@ def write_flag_to_file(filename, bradycardia, tachycardia):
     """
 
     if bradycardia is True:
-        logg.warning(Bradycardia_detected)
+        import logging as log
+        log.warning(Bradycardia_detected)
 
         print(Bradycardia_detected)
 
     if tachycardia is True:
-        logg.warning(Tachycardia_detected)
+        import logging as log
+        log.warning(Tachycardia_detected)
 
         print(Tachycardia_detected)
 
@@ -525,7 +543,8 @@ def shift_signal_buff(signals, Fs, t=2):
     :param int t: time to shift by in seconds
     :return list new_signals: updated signals buffer
     """
-    log_debug("Manipulating the signal buffer.\n")
+    import logging as log
+    log.debug("Manipulating the signal buffer.\n")
 
     remove_buffer = Fs * t
     pad = [0 for x in range(remove_buffer)]
@@ -544,7 +563,8 @@ def calc_hr_with_n_sig(heart_rates, n):
     :param int n: the signal number that one wants to use to calculate HR (bpm)
     :return float hr: calculated HR (in bpm)
     """
-    log_debug("Calculating heart rate.\n")
+    import logging as log
+    log.debug("Calculating heart rate.\n")
 
     N = len(heart_rates)
 
@@ -556,18 +576,8 @@ def calc_hr_with_n_sig(heart_rates, n):
         except IndexError:
             errormsg = "An error occurred trying to use signal #%d to calculat\
             e heart rate!" % n
-            logg.error(errormsg)
+            log.error(errormsg)
             print(errormsg)
             hr = helper.listAverage(heart_rates)
 
     return round(hr, 2)
-
-
-def log_debug(debug_string):
-    """
-    This function logs a message at the DEBUG level to an output file
-
-    :param str debug_string: the message to be written to the log file
-    """
-    logg.debug(debug_string)
-    return
