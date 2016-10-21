@@ -15,16 +15,21 @@ def main():
     # READ IN COMMNAD LINE ARGUMENTS
     main_args = hr.parse_command_line_args()
 
-    binary_file = main_args.binary_file
+    input_file = main_args.input_file
     name = main_args.name
     read_time = main_args.read_time
     age = main_args.age
-    N = main_args.N
-    N_used = main_args.n_sig_used
+    N = main_args.N  # number of signals being multiplexed
+    N_used = main_args.n_sig_used  # number of signals being used to get HR
     log_level = main_args.log_level
 
     # NOTE. Initialize the output (logging) file before anything else
     hr.init_output_file(hr.Output_filename, name, log_level)
+
+    # NOTE. Input file type needs to be verified
+    file_type = hr.check_input_data(input_file)
+
+    multiplexed_data = hr.multiplex_data(input_file, file_type, N)
 
     from time import time
 
@@ -33,7 +38,7 @@ def main():
     b = 0  # counter for the byte number that is being read in
 
     # 1. Determine Sampling Frequency, Fs
-    Fs, b = hr.read_data(binary_file, b)
+    Fs, b = hr.read_data(multiplexed_data, b, file_type)
 
     # 2. Start reading in data based on input time variable
     # A) Make sure time is at least 5 seconds and a whole number
@@ -52,7 +57,7 @@ def main():
     for i in range(samples):
         for j in range(len(signals)):
 
-            v, b = hr.read_data(binary_file, b)
+            v, b = hr.read_data(multiplexed_data, b, file_type)
             if v == hr.EOF:  # check for EOF
                 print(hr.EOF)
                 return

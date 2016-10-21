@@ -22,9 +22,10 @@ def parse_command_line_args():
     parser = argp.ArgumentParser(description="Command line argument parser for\
     heart_rate_main.py")
 
-    parser.add_argument("--binary_file",
-                        dest="binary_file",
-                        help="Input binary file. DEFAULT=test.bin",
+    parser.add_argument("--input_file",
+                        dest="input_file",
+                        help="Input file. Only binary, MATLAB formatted data, \
+                        and HDF5 are supported. DEFAULT=data16bit.bin",
                         type=str,
                         default="test.bin")
     parser.add_argument("--user_name",
@@ -98,14 +99,15 @@ def check_input_data(input_file):
         # 1. Testing for MATLAB formatted data file
         from scipy.io import loadmat
 
-        loadmat(input_file)
+        f = loadmat(input_file)
         ftype = ".mat"
     except ValueError:
         try:
             # 2. Testing for HDF5 file
             from h5py import File
 
-            File(input_file, "r")
+            f = File(input_file, 'r')
+            f.close()
             ftype = ".hdf5"
         except OSError:
             # 3. Assume a binary file
@@ -152,6 +154,7 @@ def multiplex_data(input_file, ftype, n_mp):
         Fs = f.get("Fs").shape[0]
         ECG = list(f.get("ECG").shape)
         PP = list(f.get("PP").shape)
+        f.close()
 
     else:
         log.error("Unexpected input file format.\n")
@@ -162,30 +165,46 @@ def multiplex_data(input_file, ftype, n_mp):
     return mpx_data
 
 
-def read_data(multplx_data, read_from):
+def read_data(multplx_data, read_from, dtype):
     """
     This function reads in a single byte from a binary file and converts it to
     integer value assuming bit size of 16
 
-    :param str file: name of the input binary file OR
+    :param multplx_data: name of the input binary file (str) OR list of data \
+    from either an input MATLAB formatted data or HDF5 file
     :param int read_from: represents the number byte to start reading from
+    :param str dtype: input file type (should be one of the returned values\
+    from 'check_input_data')
     :return int v: the integer value of the byte read
-    :return int read_from + 2: represents the next byte number to be read
+    :return int read_from: represents the next byte number to be read
     """
     import logging as log
     log.debug("Reading in data.\n")
 
-    with open(file, 'rb') as f:
-        f.seek(read_from)
-        bs = f.read(1)
-        if bs == b'':
-            return EOF, read_from
-        try:
-            v = int.from_bytes(bs, 'little')
-        except TypeError:
-            v = None
+    if dtype == ".bin":
+        with open(multplx_data, 'rb') as f:
+            f.seek(read_from)
+            bs = f.read(1)
+            if bs == b'':
+                return EOF, read_from
+            try:
+                v = int.from_bytes(bs, 'little')
+            except TypeError:
+                v = None
 
-    return v, read_from + 2
+        read_from += 2
+
+    else:
+        try:
+            v = int(multplx_data[read_from])
+            read_from += 1
+        except ValueError:
+            log.error("Unexpected data type in input file.\n")
+            raise ValueError
+        except IndexError:
+            return EOF, read_from
+
+    return v, read_from
 
 
 def no_NaNsense(signal):
