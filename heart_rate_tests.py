@@ -5,17 +5,70 @@ import heart_rate_helpers as helper
 
 class run(unittest.TestCase):
 
+    def test_check_input_data(self):
+        """
+        Tests the check_input_data function form heart_rate.py
+        """
+        # Test binary file
+        output1 = hr.check_input_data("test.bin")
+
+        # Test MATLAB formatted data file
+        output2 = hr.check_input_data("test_mat.mat")
+
+        # Test HDF5 file
+        output3 = hr.check_input_data("test_h5.hdf5")
+
+        self.assertEqual(output1, ".bin", msg="Check the recycling BIN for the\
+        correct answer")
+        self.assertEqual(output2, ".mat", msg="What is the MATter? Python got \
+        your tongue?")
+        self.assertEqual(output3, ".hdf5", msg="I do not really have a clever \
+        phrase for hdf5, but you messed up with this hierarchial file :)")
+
+    def test_multiplex_data(self):
+        """
+        Tests the multiplex_data function from heart_rate.py
+        """
+        # Binary file
+        output1 = hr.multiplex_data("test.bin", ".bin", 2)
+        test1 = "test.bin"
+
+        # MATLAB formatted data file
+        output2 = hr.multiplex_data("test_mat.mat", ".mat", 2)
+        test2 = [1000, 1, 0, 3, 2, 5, 4, 7, 6, 9, 8]
+
+        # HDF5 file
+        output3 = hr.multiplex_data("test_h5.hdf5", ".hdf5", 2)
+
+        self.assertEqual(output1, test1, msg="Your python skills should \
+        be thrown in the trash BIN right now.")
+        self.assertListEqual(output2, test2, msg="Don't get MAT, get gLAB!")
+        self.assertListEqual(output3, test2, msg="HDF5 is no fun...at all")
+
     def test_read_data(self):
         """
         Tests the read_data function from heart_rate.py
         """
-        # CREATE BINARY FILE HERE
-        binary_file = "test.bin"
+        # Binary file Test
+        file = "test.bin"
+        ftype = ".bin"
 
-        v1, b1 = hr.read_data(binary_file, 0)
-        v2, b2 = hr.read_data(binary_file, b1)
+        v1, b1 = hr.read_data(file, 0, ftype)
+        v2, b2 = hr.read_data(file, b1, ftype)
 
-        # DELETE BINARY FILE HERE
+        # MATLAB formatted data file Test
+        ftype = ".mat"
+        file = hr.multiplex_data("test_mat.mat", ftype, 2)
+
+        v3, b3 = hr.read_data(file, 0, ftype)
+        v4, b4 = hr.read_data(file, b3, ftype)
+
+        # HDF5 file Test
+        ftype = ".hdf5"
+        file = hr.multiplex_data("test_h5.hdf5", ftype, 2)
+
+        v5, b5 = hr.read_data(file, 0, ftype)
+        v6, b6 = hr.read_data(file, b5, ftype)
 
         # Test Case 1 - Accurate output values
         self.assertEqual(v1, 1, msg="There are 10 types of people...those who \
@@ -27,9 +80,31 @@ class run(unittest.TestCase):
         self.assertEqual(b2, 4, msg="The number four (4) is a beautiful\
         number")
 
+        self.assertEqual(v3, 1000, msg="Why are MATLAB formatted data files ca\
+        using you trouble?")
+        self.assertEqual(v4, 1, msg="You have an issue with MATLAB data files \
+        it seems")
+        self.assertEqual(b3, 1, msg="You hungry? Cause this byte does not add \
+        up :P")
+        self.assertEqual(b4, 2, msg="The number two (2) is a beautiful\
+        number")
+
+        self.assertEqual(v5, 1000, msg="Why are HDF5 files causing you trouble\
+        ?")
+        self.assertEqual(v6, 1, msg="You have an issue with HDF5 files it seem\
+        s")
+        self.assertEqual(b5, 1, msg="You hungry? Cause this byte does not add \
+        up :P")
+        self.assertEqual(b6, 2, msg="The number two (2)) is a beautiful\
+        number")
+
         # Test Case 2 - Correct output type
         self.assertEqual(type(v1), int, msg="NaN...and I don't mean that delic\
-        ious Indian bread")
+        ious Indian bread #1")
+        self.assertEqual(type(v3), int, msg="NaN...and I don't mean that delic\
+        ious Indian bread #3")
+        self.assertEqual(type(v5), int, msg="NaN...and I don't mean that delic\
+        ious Indian bread #5")
 
     def test_no_NaNsense(self):
         """
