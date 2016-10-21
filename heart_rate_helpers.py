@@ -181,3 +181,49 @@ def dotProduct(list1, list2):
         dp += list1[i] * list2[i]
 
     return dp
+
+
+def multiplex(Fs, signal1, signal2):
+    """
+    This function multiplexes data from two input signals into one single \
+    list, where the first value is sampling frequency and the following \
+    values contain the multiplexed values from each signal
+
+    :param int Fs: sampling frequency (in Hz)
+    :param list signal1: an input signal
+    :param list signal2: an input signal
+    :return list mplex: multiplexed signal
+    """
+    # 1. The length of mplex should be determined first
+    # NOTE. It is possible (though not ideal) that one signal is longer than
+    # the other...in such a case only values with overlapping indices will be
+    # copied to mplex (i.e. shorter length will be used)
+    length1 = len(signal1)
+    length2 = len(signal2)
+    if length1 < length2:
+        mplexLen = length1
+    else:
+        mplexLen = length2
+
+    mplex = [0 for x in range(2 * mplexLen + 1)]  # add one for Fs
+
+    # 2. Set Fs
+    mplex[0] = Fs
+
+    # 3. Multiplexing Time!
+    i = 1  # mplex index counter
+    for m in range(mplexLen):
+        mplex[i] = signal1[m]
+        i += 1
+        mplex[i] = signal2[m]
+        i += 1
+
+    return mplex
+
+
+
+logDict = {"DEBUG": 10,
+           "INFO": 20,
+           "WARNING": 30,
+           "ERROR": 40,
+           "CRITICAL": 50}

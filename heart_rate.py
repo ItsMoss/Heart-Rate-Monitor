@@ -14,14 +14,18 @@ def parse_command_line_args():
 
     :return object args: contains all parsed command line arguments
     """
+    import logging as log
+    log.debug("Parsing command line arguments.\n")
+
     import argparse as argp
 
     parser = argp.ArgumentParser(description="Command line argument parser for\
     heart_rate_main.py")
 
-    parser.add_argument("--binary_file",
-                        dest="binary_file",
-                        help="Input binary file. DEFAULT=test.bin",
+    parser.add_argument("--input_file",
+                        dest="input_file",
+                        help="Input file. Only binary, MATLAB formatted data, \
+                        and HDF5 are supported. DEFAULT=data16bit.bin",
                         type=str,
                         default="test.bin")
     parser.add_argument("--user_name",
@@ -53,6 +57,13 @@ def parse_command_line_args():
                         all signals are used. DEFAULT=2",
                         type=int,
                         default=2)
+    parser.add_argument("--log_level",
+                        dest="log_level",
+                        help="Level of logging user wishes to be printed to ou\
+                        tput file. Accepatable values are DEBUG, INFO, WARNING\
+                        , ERROR, and CRITICAL. DEFAULT=DEBUG",
+                        type=str,
+                        default="DEBUG")
 
     args = parser.parse_args()
 
@@ -72,27 +83,128 @@ def parse_command_line_args():
     return args
 
 
-def read_data(file, read_from):
+def check_input_data(input_file):
+    """
+    This function determines what the input file type is: It accommodates
+    binary, HDF5, and MATLAB formatted data files.
+
+    :param str input_file: name of the input file
+    :return str ftype: the determined file type of input_file
+    """
+    import logging as log
+
+    log.debug("Determining input data file type.\n")
+
+    try:
+        # 1. Testing for MATLAB formatted data file
+        from scipy.io import loadmat
+
+        f = loadmat(input_file)
+        ftype = ".mat"
+    except ValueError:
+        try:
+            # 2. Testing for HDF5 file
+            from h5py import File
+
+            f = File(input_file, 'r')
+            f.close()
+            ftype = ".hdf5"
+        except OSError:
+            # 3. Assume a binary file
+            ftype = ".bin"
+
+    return ftype
+
+
+def multiplex_data(input_file, ftype, n_mp):
+    """
+    This file multiplexes the input data for .mat and .hdf5 files
+
+    :param str input_file: name of input file
+    :param str ftype: input file type
+    :param int n_mp: number of signals being multiplexed
+    :return mpx_data: the multiplexed data (this remains a file if ftype is th\
+    at of a binary file, therefore making returning a str...otherwise a list\
+    is returned
+    """
+    if ftype == ".bin":
+        return input_file
+
+    import logging as log
+
+    log.debug("Multiplexing input data.\n")
+
+    if n_mp != 2:
+        log.error("You did not specify the required number of signals to be mu\
+        ltiplexed=2.")
+        raise IndexError
+
+    if ftype == ".mat":
+        from scipy.io import loadmat
+
+        f = loadmat(input_file)
+        Fs = f.get("Fs")[0][0]
+        ECG = list(f.get("ECG")[0])
+        PP = list(f.get("PP")[0])
+
+    elif ftype == ".hdf5":
+        from h5py import File
+
+        f = File(input_file, 'r')
+        Fs = f.get("Fs").shape[0]
+        ECG = list(f.get("ECG").shape)
+        PP = list(f.get("PP").shape)
+        f.close()
+
+    else:
+        log.error("Unexpected input file format.\n")
+        raise IOError
+
+    mpx_data = helper.multiplex(Fs, ECG, PP)
+
+    return mpx_data
+
+
+def read_data(multplx_data, read_from, dtype):
     """
     This function reads in a single byte from a binary file and converts it to
     integer value assuming bit size of 16
 
-    :param str file: name of the input binary file
+    :param multplx_data: name of the input binary file (str) OR list of data \
+    from either an input MATLAB formatted data or HDF5 file
     :param int read_from: represents the number byte to start reading from
+    :param str dtype: input file type (should be one of the returned values\
+    from 'check_input_data')
     :return int v: the integer value of the byte read
-    :return int read_from + 2: represents the next byte number to be read
+    :return int read_from: represents the next byte number to be read
     """
-    with open(file, 'rb') as f:
-        f.seek(read_from)
-        bs = f.read(1)
-        if bs == b'':
-            return EOF, read_from
-        try:
-            v = int.from_bytes(bs, 'little')
-        except TypeError:
-            v = None
+    import logging as log
+    log.debug("Reading in data.\n")
 
-    return v, read_from + 2
+    if dtype == ".bin":
+        with open(multplx_data, 'rb') as f:
+            f.seek(read_from)
+            bs = f.read(1)
+            if bs == b'':
+                return EOF, read_from
+            try:
+                v = int.from_bytes(bs, 'little')
+            except TypeError:
+                v = None
+
+        read_from += 2
+
+    else:
+        try:
+            v = int(multplx_data[read_from])
+            read_from += 1
+        except ValueError:
+            log.error("Unexpected data type in input file.\n")
+            raise ValueError
+        except IndexError:
+            return EOF, read_from
+
+    return v, read_from
 
 
 def no_NaNsense(signal):
@@ -104,11 +216,15 @@ def no_NaNsense(signal):
     :param list signal: a list
     :return list signal_no_nan: list without any NaN's
     """
+    import logging as log
+    log.debug("Removing NaNs from signal.\n")
 
     # Firstly, let's check that the length of the list is greater than 2
     if len(signal) < 3:
-        print("This list representing your signal is too small. Length=%d\n\
-        " % len(signal))
+        errormsg = "This list representing your signal is too small. Length=%d\
+        \n" % len(signal)
+        log.error(errormsg)
+        print(errormsg)
         raise IndexError
 
     # Now let's check all values excluding the first and last indices
@@ -138,6 +254,9 @@ def remove_offset(signal):
     :param list signal: input signal
     :return list signal_clean: cleaned up signal (i.e. without offset)
     """
+    import logging as log
+    log.debug("Removing DC offset.\n")
+
     from numpy import int16, ones, convolve
 
     np_signal = helper.list2numpy(signal)
@@ -162,6 +281,9 @@ def band_stop_filter(signal, Fs, Fc=60):
     :param int Fc: cutoff frequency in Hz
     :return list signal_clean: cleaned up signal (i.e. filtered)
     """
+    import logging as log
+    log.debug("Applying band stop filter.\n")
+
     from scipy.signal import butter, filtfilt
 
     np_signal = helper.list2numpy(signal)
@@ -190,6 +312,9 @@ def normalize(signal):
     :param list signal: input signal
     :return list norm_signal: normalized signal
     """
+    import logging as log
+    log.debug("Normalizing signal.\n")
+
     # Let's find the maximum and minimum values
     maximum = max(signal)
     minimum = min(signal)
@@ -219,12 +344,17 @@ def make_QRS_kernel(Fs, amplitude=1):
     :param int amplitude: amplitude of spike
     :return list kernel: calculated QRS kernel
     """
+    import logging as log
+    log.debug("Creating transient QRS kernel.\n")
+
     # Initialize list based off of Fs
     t = 0.10   # QRS time-length
     samples = helper.myRound(Fs * t + 1)
 
     if samples < 3:
-        print("\nSampling frequency is ridiculously low\n")
+        errormsg = "\nSampling frequency is ridiculously low\n"
+        print(errormsg)
+        log.error(errormsg)
         raise IndexError  # This really should not happen
 
     kernel = [0 for x in range(samples)]
@@ -254,8 +384,13 @@ def cross_correlate(signal, kernel):
     :param list kernel: input kernel
     :return list x_coeffs: list of calculated cross correlation coefficients
     """
+    import logging as log
+    log.debug("Cross correlating signal and kernel.\n")
+
     if len(kernel) >= len(signal):
-        print("\nKernel length cannot be greater than signal length\n")
+        errormsg = "\nKernel length cannot be greater than signal length\n"
+        print(errormsg)
+        log.error(errormsg)
         raise IndexError
 
     # Initialize correlation coefficients list
@@ -278,6 +413,9 @@ def find_peaks(signal, Fs):
     :param list signal: inut signal
     :return int peak_count: number of peaks detected
     """
+    import logging as log
+    log.debug("Finding peaks in signal.\n")
+
     L = len(signal)
     threshold = 0.6 * max(signal)
     peak_count = 0
@@ -315,6 +453,8 @@ def calculate_heart_rate(beats, time):
     :param int time: number of elapsed seconds
     :return float hr: calculated heart rate in bpm
     """
+    import logging as log
+    log.debug("Calculating heart rate.\n")
 
     hr = beats / time * 60
 
@@ -328,6 +468,8 @@ def detect_bradycardia(heart_rate):
     :param float heart_rate: heart rate in bpm
     :return ble bradycardia: whether or not bradycardia detected
     """
+    import logging as log
+    log.debug("Checking for bradycardia.\n")
 
     hr_low = 50  # Assuming a heart rate below 50 bpm is too slow
 
@@ -346,6 +488,8 @@ def detect_tachycardia(heart_rate, age):
     :param int age: age of user/patient
     :return ble tachycardia: whether or not tachycardia detected
     """
+    import logging as log
+    log.debug("Checking for tachycardia.\n")
 
     hr_hi = round(207 - (0.7 * age), 2)
 
@@ -366,9 +510,14 @@ def one_minute_update(current_time, start_time, avg_hr):
     :param int avg_hr: total beats count for passed minute
     :return float new_start: new start time (only change if one minute elapsed)
     """
+    import logging as log
+    log.debug("Checking if one-minute average should be calculated.\n")
+
     new_start = start_time
 
     if current_time - start_time > 60:
+        log.debug("Calculating one-minute average.\n")
+
         # print one minute average
         new_start = current_time
         return new_start
@@ -386,9 +535,14 @@ def five_minute_update(current_time, start_time, avg_hr):
     :param int avg_hr: total beats count for passed 5 minutes
     :return float new_start: new start time(only change if five minute elapsed)
     """
+    import logging as log
+    log.debug("Checking if five-minute average should be calculated.\n")
+
     new_start = start_time
 
     if current_time - start_time > 300:
+        log.debug("Calculating five-minute average.\n")
+
         # print five minute average
         new_start = current_time
         return new_start
@@ -396,17 +550,22 @@ def five_minute_update(current_time, start_time, avg_hr):
     return new_start
 
 
-def init_output_file(filename, name):
+def init_output_file(fname, name, log_level):
     """
     This function initializes an output file for continuous log of heart rate
     data for a user/patient (in .txt format)
 
-    :param str filename: desired name for output file (without file extension)
+    :param str fname: desired name for output file (without file extension)
     :param str name: name of the user/patient
+    :param str log_level: the desired level of logging for the output file
     """
+    import logging as log
 
-    with open(filename+".txt", 'w') as f:
-        f.write("This file is a continuous Heart Rate log for "+name+"\n\n")
+    log.basicConfig(filename=fname+'.txt', level=helper.logDict[log_level])
+    message = "This file is a continuous Heart Rate log for "+name+"\n"
+    log.info(message)
+
+    return
 
 
 def write_inst_to_file(filename, time, hr):
@@ -418,12 +577,14 @@ def write_inst_to_file(filename, time, hr):
     :param float time: current time in seconds
     :param float hr: calculated instantaneous heart rate in bpm
     """
+    import logging as log
     write_line = "time=%.2f s   |   heart rate=%.2f bpm\n" % (time, hr)
 
     print(write_line)
 
-    with open(filename+".txt", 'a') as f:
-        f.write(write_line)
+    log.info(write_line)
+
+    return
 
 
 def write_min_to_file(filename, hr, minutes='one'):
@@ -436,12 +597,14 @@ def write_min_to_file(filename, hr, minutes='one'):
     :param str minutes: minutes for which average is being printed for
     """
     if minutes == 'one' or minutes == 'five':
+        import logging as log
         write_line = "\n"+minutes+"-minute average=%.2f bpm\n" % (hr)
 
         print(write_line)
 
-        with open(filename+".txt", 'a') as f:
-            f.write(write_line)
+        log.info(write_line)
+
+    return
 
 
 def write_flag_to_file(filename, bradycardia, tachycardia):
@@ -455,16 +618,18 @@ def write_flag_to_file(filename, bradycardia, tachycardia):
     """
 
     if bradycardia is True:
-        with open(filename+".txt", 'a') as f:
-            f.write(Bradycardia_detected)
+        import logging as log
+        log.warning(Bradycardia_detected)
 
         print(Bradycardia_detected)
 
     if tachycardia is True:
-        with open(filename+".txt", 'a') as f:
-            f.write(Tachycardia_detected)
+        import logging as log
+        log.warning(Tachycardia_detected)
 
         print(Tachycardia_detected)
+
+    return
 
 
 def shift_signal_buff(signals, Fs, t=2):
@@ -477,6 +642,9 @@ def shift_signal_buff(signals, Fs, t=2):
     :param int t: time to shift by in seconds
     :return list new_signals: updated signals buffer
     """
+    import logging as log
+    log.debug("Manipulating the signal buffer.\n")
+
     remove_buffer = Fs * t
     pad = [0 for x in range(remove_buffer)]
 
@@ -494,6 +662,9 @@ def calc_hr_with_n_sig(heart_rates, n):
     :param int n: the signal number that one wants to use to calculate HR (bpm)
     :return float hr: calculated HR (in bpm)
     """
+    import logging as log
+    log.debug("Calculating heart rate.\n")
+
     N = len(heart_rates)
 
     if n == N:
@@ -502,8 +673,10 @@ def calc_hr_with_n_sig(heart_rates, n):
         try:
             hr = heart_rates[n]
         except IndexError:
-            print("An error occurred trying to use signal #%d to calculate hea\
-            rt rate!" % n)
+            errormsg = "An error occurred trying to use signal #%d to calculat\
+            e heart rate!" % n
+            log.error(errormsg)
+            print(errormsg)
             hr = helper.listAverage(heart_rates)
 
     return round(hr, 2)
