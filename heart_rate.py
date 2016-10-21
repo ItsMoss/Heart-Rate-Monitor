@@ -82,12 +82,92 @@ def parse_command_line_args():
     return args
 
 
-def read_data(file, read_from):
+def check_input_data(input_file):
+    """
+    This function determines what the input file type is: It accommodates
+    binary, HDF5, and MATLAB formatted data files.
+
+    :param str input_file: name of the input file
+    :return str ftype: the determined file type of input_file
+    """
+    import logging as log
+
+    log.debug("Determining input data file type.\n")
+
+    try:
+        # 1. Testing for MATLAB formatted data file
+        from scipy.io import loadmat
+
+        loadmat(input_file)
+        ftype = ".mat"
+    except ValueError:
+        try:
+            # 2. Testing for HDF5 file
+            from h5py import File
+
+            File(input_file, "r")
+            ftype = ".hdf5"
+        except OSError:
+            # 3. Assume a binary file
+            ftype = ".bin"
+
+    return ftype
+
+
+def multiplex_data(input_file, ftype, n_mp):
+    """
+    This file multiplexes the input data for .mat and .hdf5 files
+
+    :param str input_file: name of input file
+    :param str ftype: input file type
+    :param int n_mp: number of signals being multiplexed
+    :return mpx_data: the multiplexed data (this remains a file if ftype is th\
+    at of a binary file, therefore making returning a str...otherwise a list\
+    is returned
+    """
+    if ftype == ".bin":
+        return input_file
+
+    import logging as log
+
+    log.debug("Multiplexing input data.\n")
+
+    if n_mp != 2:
+        log.error("You did not specify the required number of signals to be mu\
+        ltiplexed=2.")
+        raise IndexError
+
+    if ftype == ".mat":
+        from scipy.io import loadmat
+
+        f = loadmat(input_file)
+        Fs = f.get("Fs")[0][0]
+        ECG = list(f.get("ECG")[0])
+        PP = list(f.get("PP")[0])
+
+    elif ftype == ".hdf5":
+        from h5py import File
+
+        f = File(input_file, 'r')
+        Fs = f.get("Fs").shape[0]
+        ECG = list(f.get("ECG").shape)
+        PP = list(f.get("PP").shape)
+
+    else:
+        log.error("Unexpected input file format.\n")
+        raise IOError
+
+    mpx_data = helper.multiplex(Fs, ECG, PP)
+
+    return mpx_data
+
+
+def read_data(multplx_data, read_from):
     """
     This function reads in a single byte from a binary file and converts it to
     integer value assuming bit size of 16
 
-    :param str file: name of the input binary file
+    :param str file: name of the input binary file OR
     :param int read_from: represents the number byte to start reading from
     :return int v: the integer value of the byte read
     :return int read_from + 2: represents the next byte number to be read
@@ -462,7 +542,7 @@ def init_output_file(fname, name, log_level):
     """
     import logging as log
 
-    log.basicConfig(filename=fname+'.log', level=helper.logDict[log_level])
+    log.basicConfig(filename=fname+'.txt', level=helper.logDict[log_level])
     message = "This file is a continuous Heart Rate log for "+name+"\n"
     log.info(message)
 
