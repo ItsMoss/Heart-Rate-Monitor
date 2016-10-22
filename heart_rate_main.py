@@ -1,6 +1,7 @@
 import heart_rate as hr
 import heart_rate_helpers as helper
 from sys import argv
+from logging import debug
 
 
 def main():
@@ -39,6 +40,7 @@ def main():
 
     # 1. Determine Sampling Frequency, Fs
     Fs, b = hr.read_data(multiplexed_data, b, file_type)
+    debug("The sampling frequency is %d Hz.\n" % Fs)
 
     # 2. Start reading in data based on input time variable
     # A) Make sure time is at least 5 seconds and a whole number

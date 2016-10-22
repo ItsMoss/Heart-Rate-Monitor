@@ -14,9 +14,6 @@ def parse_command_line_args():
 
     :return object args: contains all parsed command line arguments
     """
-    import logging as log
-    log.debug("Parsing command line arguments.\n")
-
     import argparse as argp
 
     parser = argp.ArgumentParser(description="Command line argument parser for\
@@ -27,7 +24,7 @@ def parse_command_line_args():
                         help="Input file. Only binary, MATLAB formatted data, \
                         and HDF5 are supported. DEFAULT=data16bit.bin",
                         type=str,
-                        default="test.bin")
+                        default="data16bit.bin")
     parser.add_argument("--user_name",
                         dest="name",
                         help="Full name of the user. DEFAULT=Assignment 03",
@@ -561,7 +558,7 @@ def init_output_file(fname, name, log_level):
     """
     import logging as log
 
-    log.basicConfig(filename=fname+'.txt', level=helper.logDict[log_level])
+    log.basicConfig(filename=fname+'.log', level=helper.logDict[log_level])
     message = "This file is a continuous Heart Rate log for "+name+"\n"
     log.info(message)
 

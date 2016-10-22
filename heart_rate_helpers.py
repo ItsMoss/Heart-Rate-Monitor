@@ -221,7 +221,6 @@ def multiplex(Fs, signal1, signal2):
     return mplex
 
 
-
 logDict = {"DEBUG": 10,
            "INFO": 20,
            "WARNING": 30,
