@@ -407,23 +407,6 @@ class run(unittest.TestCase):
         self.assertEqual(output2, False, msg="Maybe you do NOT have a few too \
         many heartbeats, but a few too many [insert insult]")
 
-    def test_time_10s(self):
-        """
-        Tests ability to time for an alotted amount of time, in this case 10s
-        """
-        from time import time
-
-        start = time()
-        end = time()
-        while end - start <= 10:
-            end = time()
-
-        elapsed = end - start
-        print("Elapsed time: %r" % elapsed)
-
-        self.assertLessEqual(abs(elapsed - 10), 0.05, msg="I know you are not \
-        a clock, but you have to do better than that")
-
 
 if __name__ == '__main__':
     unittest.main()
