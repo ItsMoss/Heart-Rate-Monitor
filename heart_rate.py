@@ -181,7 +181,7 @@ def read_data(multplx_data, read_from, dtype):
     if dtype == ".bin":
         with open(multplx_data, 'rb') as f:
             f.seek(read_from)
-            bs = f.read(1)
+            bs = f.read(2)
             if bs == b'':
                 return EOF, read_from
             try:
