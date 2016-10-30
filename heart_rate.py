@@ -497,54 +497,80 @@ def detect_tachycardia(heart_rate, age):
     return tachycardia
 
 
-def one_minute_update(current_time, start_time, avg_hr):
+def one_minute_update(timer, avg_summed, counter):
     """
     This function determines if one minute has passed between printing 1 minute
     average heart rate, and prints 1 minute average if one minute has elapsed
 
-    :param float current_time: the current time in seconds of program running
-    :param float start_time: time in seconds of program start
-    :param int avg_hr: total beats count for passed minute
-    :return float new_start: new start time (only change if one minute elapsed)
+    :param float timer: the current time in seconds since last 1 minute span
+    :param int avg_summed: summed average heart rates for passed 1 minute
+    :param int counter: counter of how many averages have beenn taken past min
+    :return float new_timer: new start time(only change if one minute elapsed)
+    :return int new_avg: new summed averages count for passed 1 minute
+    :return int new_count: new counter, reset if 1 minute elapsed
     """
     import logging as log
     log.debug("Checking if one-minute average should be calculated.\n")
 
-    new_start = start_time
+    new_timer = timer
+    new_avg = avg_summed
+    new_count = counter
 
-    if current_time - start_time > 60:
+    if timer >= 60:
         log.debug("Calculating one-minute average.\n")
 
-        # print one minute average
-        new_start = current_time
-        return new_start
+        hr = avg_summed / counter
 
-    return new_start
+        write_line = "One minute average: heart rate=%.2f bpm\n" % hr
+
+        print(write_line)
+
+        log.info(write_line)
+
+        new_timer = 0
+        new_avg = 0
+        new_count = -1  # must be -1 because end of while loop in main
+        # increments
+
+    return new_timer, new_avg, new_count
 
 
-def five_minute_update(current_time, start_time, avg_hr):
+def five_minute_update(timer, avg_summed, counter):
     """
     This function determines if five minutes passed between printing 5 minute
     average heart rate, and prints 5 minute average if five minutes has elapsed
 
-    :param float current_time: the current time in seconds of program running
-    :param float start_time: time in seconds of program start
-    :param int avg_hr: total beats count for passed 5 minutes
-    :return float new_start: new start time(only change if five minute elapsed)
+    :param float timer: the current time in seconds since last 5 minute span
+    :param int avg_summed: summed average heart rates for passed 5 minutes
+    :param int counter: counter of how many averages have beenn taken past 5min
+    :return float new_timer: new start time(only change if five minute elapsed)
+    :return int new_avg: new summed averages count for passed 5 minutes
+    :return int new_count: new counter, reset if 5 minutes elapsed
     """
     import logging as log
     log.debug("Checking if five-minute average should be calculated.\n")
 
-    new_start = start_time
+    new_timer = timer
+    new_avg = avg_summed
+    new_count = counter
 
-    if current_time - start_time > 300:
+    if timer >= 300:
         log.debug("Calculating five-minute average.\n")
 
-        # print five minute average
-        new_start = current_time
-        return new_start
+        hr = avg_summed / counter
 
-    return new_start
+        write_line = "Five minute average: heart rate=%.2f bpm\n" % hr
+
+        print(write_line)
+
+        log.info(write_line)
+
+        new_timer = 0
+        new_avg = 0
+        new_count = 0  # must be -1 because end of while loop in main
+        # increments
+
+    return new_timer, new_avg, new_count
 
 
 def init_output_file(fname, name, log_level):

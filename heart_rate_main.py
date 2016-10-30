@@ -97,14 +97,19 @@ def main():
     Tachycardia = hr.detect_tachycardia(HR, age)
 
     # 5. Output
+    real_time = read_time
     # A) Print instantaneous heart rate
-    hr.write_inst_to_file(hr.Output_filename, time, HR)
+    hr.write_inst_to_file(hr.Output_filename, real_time, HR)
 
     # B) Check if 1 or 5 minute update should be printed
     one_sum = HR
-    five_sum = HR
-    start_time1, one_sum = hr.one_minute_update(time, time, one_sum)
-    start_time5, five_sum = hr.five_minute_update(time, time, five_sum)
+    fiv_sum = HR
+    one_min_timer = read_time
+    fiv_min_timer = read_time
+    one_min_timer, one_sum, one_min_count = hr.one_minute_update(one_min_timer,
+                                                                 one_sum, 0)
+    fiv_min_timer, fiv_sum, fiv_min_count = hr.five_minute_update(fiv_min_timer,
+                                                                  fiv_sum, 0)
 
     # C) Write bradycardia/tachycardia warnings to output file
     hr.write_flag_to_file(hr.Output_filename, Bradycardia, Tachycardia)
@@ -112,7 +117,8 @@ def main():
     # Repeat 2(D) to 5(B) making sure to update next 2 seconds worth of data
     # until EOF reached
     t_cycle = 2
-    loop_count = 1
+    one_min_count = 1
+    fiv_min_count = 1
     while True:
         for q in range(len(signals_buffer)):
             signals_buffer[q] = hr.shift_signal_buff(signals_buffer[q], Fs,
@@ -164,20 +170,26 @@ def main():
 
         # 5. Output
         # A) Print instantaneous heart rate
-        hr.write_inst_to_file(hr.Output_filename, time, HR)
+        real_time += t_cycle
+        hr.write_inst_to_file(hr.Output_filename, real_time, HR)
 
         # B) Check if 1 or 5 minute update should be printed
         one_sum += HR
-        five_sum += HR
-        time, one_sum = hr.one_minute_update(time, time,
-                                                    one_sum / loop_count)
-        time, five_sum = hr.five_minute_update(time, time,
-                                                      five_sum / loop_count)
+        fiv_sum += HR
+        one_min_timer += t_cycle
+        fiv_min_timer += t_cycle
+        one_min_timer, one_sum, one_min_count = hr.one_minute_update(one_min_timer,
+                                                                     one_sum,
+                                                                     one_min_count)
+        fiv_min_timer, fiv_sum, fiv_min_count = hr.five_minute_update(fiv_min_timer,
+                                                                      fiv_sum,
+                                                                      fiv_min_count)
 
         # C) Write bradycardia/tachycardia warnings to output file
         hr.write_flag_to_file(hr.Output_filename, Bradycardia, Tachycardia)
 
-        loop_count += 1
+        one_min_count += 1
+        fiv_min_count += 1
 
 if __name__ == '__main__':
     main()
