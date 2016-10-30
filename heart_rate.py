@@ -655,12 +655,12 @@ def write_flag_to_file(filename, bradycardia, tachycardia):
     return
 
 
-def shift_signal_buff(signals, Fs, t=2):
+def shift_signal_buff(signal, Fs, t=2):
     """
     This function shifts the signal buffer list by the amount of samples
     corresponding to time t
 
-    :param list signals: the signals buffer
+    :param list signal: the signal buffer
     :param int Fs: sampling frequency in Hz
     :param int t: time to shift by in seconds
     :return list new_signals: updated signals buffer
@@ -668,12 +668,12 @@ def shift_signal_buff(signals, Fs, t=2):
     import logging as log
     log.debug("Manipulating the signal buffer.\n")
 
-    remove_buffer = Fs * t
-    pad = [0 for x in range(remove_buffer)]
+    remove_buffer = Fs * t + 1
+    pad = [0 for x in range(remove_buffer + 1)]
 
-    new_signals = signals[remove_buffer:-1] + pad
+    new_signal = signal[remove_buffer:-1] + pad
 
-    return new_signals
+    return new_signal
 
 
 def calc_hr_with_n_sig(heart_rates, n):

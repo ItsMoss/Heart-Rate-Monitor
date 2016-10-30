@@ -46,6 +46,7 @@ def main():
 
     # B) Calculate amount of samples to take
     samples = helper.myRound(Fs * read_time + 1)
+    debug("Number of samples per measurement is %d.\n" % samples)
 
     # C) Initialize list based on input n variable and samples
     signals = [[0 for x in range(samples)] for x in range(N)]
@@ -73,6 +74,7 @@ def main():
 
     # B) Band Stop Filter
     for m in range(len(signals)):
+        continue
         signals[m] = hr.band_stop_filter(signals[m], Fs)
 
     # C) Normalize Data
@@ -147,6 +149,7 @@ def main():
 
         # B) Band Stop Filter
         for m in range(len(signals)):
+            continue
             signals[m] = hr.band_stop_filter(signals[m], Fs)
 
         # C) Normalize Data
